@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Reader App</string>
+    <string name="pick_a_file">Pick a file</string>
+    <string name="file_picker_text_placeholder">No file picked!</string>
+    <string name="check_files">Check files</string>
+    <string name="placeholder_file_name">File Name</string>
+    <string name="placeholder_creation_date">Creation date</string>
+    <string name="placeholder_file_type">File type</string>
+    <string name="placeholder_file_size">File size</string>
+    <string name="placeholder_file_relative_path">File relative path</string>
+</resources>
