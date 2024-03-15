@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/prevChapter"
+        android:icon="@drawable/ic_navigate_back"
+        android:title="@string/previous_chapter_button_text"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/selectChapter"
+        android:icon="@drawable/ic_select_chapter"
+        android:title="@string/select_chapter_button_text"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/nextChapter"
+        android:icon="@drawable/ic_navigate_forward"
+        android:title="@string/next_chapter_button_text"
+        app:showAsAction="ifRoom"/>
+
+</menu>

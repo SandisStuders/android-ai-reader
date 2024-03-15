@@ -5,12 +5,17 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
+import com.google.android.material.bottomappbar.BottomAppBar;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +30,9 @@ import nl.siegmann.epublib.epub.EpubReader;
 public class EpubViewerActivity extends AppCompatActivity {
 
     ActivityEpubViewerBinding binding;
+    int currentChapter;
+    ArrayList<String> bookData;
+    WebView epubViewer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +40,10 @@ public class EpubViewerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_epub_viewer);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
+        currentChapter = 12;
+        bookData = new ArrayList<>();
 
-        WebView epubViewer = binding.epubViewer;
+        epubViewer = binding.epubViewer;
 
         Intent intent = getIntent();
         String uriString = intent.getStringExtra("URI_STRING");
@@ -47,7 +57,6 @@ public class EpubViewerActivity extends AppCompatActivity {
             Spine spine = book.getSpine();
             Log.d("MyLogs", "SPINE SIZE: " + spine.size());
 
-            ArrayList<String> data = new ArrayList<>();
             for(int i = 0; i < spine.size(); i++){
                 StringBuilder builder = new StringBuilder();
                 try {
@@ -59,21 +68,54 @@ public class EpubViewerActivity extends AppCompatActivity {
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
-                data.add(builder.toString());
+                bookData.add(builder.toString());
 
             }
-            String dataOne = data.get(12);
-            Log.d("MyLogs", dataOne);
-
-            epubViewer.loadData(dataOne,
-                    "text/html",
-                    "utf-8"
-            );
+            loadCurrentChapter();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+        BottomAppBar bottomAppBar = binding.bottomAppBar;
+        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.prevChapter) {
+                    Toast toast = Toast.makeText(binding.getRoot().getContext() , "Previous chapter", Toast.LENGTH_SHORT);
+                    toast.show();
+                    if (currentChapter > 0) {
+                        currentChapter--;
+                        loadCurrentChapter();
+                    }
+                } else if (itemId == R.id.selectChapter) {
+                    Toast toast = Toast.makeText(binding.getRoot().getContext() , "Select chapter", Toast.LENGTH_SHORT);
+                    toast.show();
+                } else if (itemId == R.id.nextChapter) {
+                    Toast toast = Toast.makeText(binding.getRoot().getContext() , "Next chapter", Toast.LENGTH_SHORT);
+                    toast.show();
+                    if (currentChapter < bookData.size() - 1) {
+                        currentChapter++;
+                        loadCurrentChapter();
+                    }
+                }
+
+                return false;
+            }
+        });
+
+    }
+
+    private void loadCurrentChapter() {
+        String dataPiece = bookData.get(currentChapter);
+        Log.d("MyLogs", dataPiece);
+
+        epubViewer.loadData(dataPiece,
+                "text/html",
+                "utf-8"
+        );
     }
 
 }
