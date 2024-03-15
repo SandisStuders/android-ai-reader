@@ -36,6 +36,7 @@ public class EpubViewerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MyLogs", "Reader started!");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_viewer);
 

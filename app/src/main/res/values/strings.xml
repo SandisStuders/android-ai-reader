@@ -11,4 +11,6 @@
     <string name="next_chapter_button_text">Next chapter</string>
     <string name="previous_chapter_button_text">Previous chapter</string>
     <string name="select_chapter_button_text">Select chapter</string>
+    <string name="text_bar_explain_button_text">Explain</string>
+    <string name="text_bar_copy_button_text">Copy</string>
 </resources>
