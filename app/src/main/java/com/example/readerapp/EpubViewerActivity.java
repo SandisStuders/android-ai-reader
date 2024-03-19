@@ -32,7 +32,7 @@ public class EpubViewerActivity extends AppCompatActivity {
     ActivityEpubViewerBinding binding;
     int currentChapter;
     ArrayList<String> bookData;
-    WebView epubViewer;
+    ReaderView epubViewer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +45,7 @@ public class EpubViewerActivity extends AppCompatActivity {
         bookData = new ArrayList<>();
 
         epubViewer = binding.epubViewer;
+        epubViewer.getSettings().setJavaScriptEnabled(true);
 
         Intent intent = getIntent();
         String uriString = intent.getStringExtra("URI_STRING");
