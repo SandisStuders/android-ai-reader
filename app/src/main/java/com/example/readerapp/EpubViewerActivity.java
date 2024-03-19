@@ -32,7 +32,8 @@ public class EpubViewerActivity extends AppCompatActivity {
     ActivityEpubViewerBinding binding;
     int currentChapter;
     ArrayList<String> bookData;
-    ReaderView epubViewer;
+//    ReaderView epubViewer;
+    WebView epubViewer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class EpubViewerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_epub_viewer);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
-        currentChapter = 12;
+        currentChapter = 8;
         bookData = new ArrayList<>();
 
         epubViewer = binding.epubViewer;
@@ -66,6 +67,7 @@ public class EpubViewerActivity extends AppCompatActivity {
                     String aux = "";
                     while ((aux = r.readLine()) != null) {
                         builder.append(aux);
+                        builder.append('\n');
                     }
                 } catch(Exception e) {
                     e.printStackTrace();
@@ -114,10 +116,16 @@ public class EpubViewerActivity extends AppCompatActivity {
         String dataPiece = bookData.get(currentChapter);
         Log.d("MyLogs", dataPiece);
 
-        epubViewer.loadData(dataPiece,
+        epubViewer.loadDataWithBaseURL(null,
+                dataPiece,
                 "text/html",
-                "utf-8"
-        );
+                "UTF-8",
+                null);
+
+//        epubViewer.loadData(dataPiece,
+//                "text/html",
+//                "utf-8"
+//        );
     }
 
 }

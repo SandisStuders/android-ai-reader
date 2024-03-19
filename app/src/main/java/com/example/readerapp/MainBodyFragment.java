@@ -50,10 +50,7 @@ public class MainBodyFragment extends Fragment {
             @Override
             public void onActivityResult(Uri uri) {
                 if (uri != null) {
-                    filePickResult.setText(uri.toString());
-                    Log.d("MyAppTag", "HEY BRO");
                     Intent intent = new Intent(getContext(), ReaderActivity.class);
-                    intent.putExtra("PDF_URI", uri.toString());
                     startActivity(intent);
                 }
             }
