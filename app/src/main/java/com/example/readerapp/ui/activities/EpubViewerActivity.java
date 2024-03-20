@@ -96,9 +96,11 @@ public class EpubViewerActivity extends AppCompatActivity {
                         currentChapter--;
                         loadCurrentChapter();
                     }
+                    return true;
                 } else if (itemId == R.id.selectChapter) {
                     Toast toast = Toast.makeText(binding.getRoot().getContext() , "Select chapter", Toast.LENGTH_SHORT);
                     toast.show();
+                    return true;
                 } else if (itemId == R.id.nextChapter) {
                     Toast toast = Toast.makeText(binding.getRoot().getContext() , "Next chapter", Toast.LENGTH_SHORT);
                     toast.show();
@@ -106,6 +108,7 @@ public class EpubViewerActivity extends AppCompatActivity {
                         currentChapter++;
                         loadCurrentChapter();
                     }
+                    return true;
                 }
 
                 return false;

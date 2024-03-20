@@ -25,6 +25,7 @@ import java.util.ArrayList;
 public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<ReadableFileDetails> readableFileDetails = new ArrayList<>();
+    private String currentListType = "RECENT";
 
     public FilesRecyclerViewAdapter() {
     }
@@ -75,13 +76,19 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 int position = holder.getAdapterPosition();
                 // Initialize the PopupMenu
                 PopupMenu popup = new PopupMenu(v.getContext(), v);
-                // Inflate the menu from xml
-                popup.inflate(R.menu.item_files_list_long_click_menu);
+
+                if (currentListType == "RECENT") {
+                    popup.inflate(R.menu.item_files_list_long_click_menu_recent);
+                } else if (currentListType == "FAVORITE") {
+                    popup.inflate(R.menu.item_files_list_long_click_menu_favorite);
+                } else {
+                    popup.inflate(R.menu.item_files_list_long_click_menu_all);
+                }
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        Toast toastEn = Toast.makeText(v.getContext() , "HERE!!!", Toast.LENGTH_SHORT);
+                        Toast toastEn = Toast.makeText(v.getContext() , currentListType, Toast.LENGTH_SHORT);
                         toastEn.show();
                         int itemId = item.getItemId();
 
@@ -93,6 +100,9 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                             toast.show();
                         } else if (itemId == R.id.action_remove_from_recent) {
                             Toast toast = Toast.makeText(v.getContext() , "Recent", Toast.LENGTH_SHORT);
+                            toast.show();
+                        } else if (itemId == R.id.action_remove_from_favorites) {
+                            Toast toast = Toast.makeText(v.getContext() , "Fav remove", Toast.LENGTH_SHORT);
                             toast.show();
                         }
 
@@ -147,4 +157,11 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         }
     }
 
+    public String getCurrentListType() {
+        return currentListType;
+    }
+
+    public void setCurrentListType(String currentListType) {
+        this.currentListType = currentListType;
+    }
 }
