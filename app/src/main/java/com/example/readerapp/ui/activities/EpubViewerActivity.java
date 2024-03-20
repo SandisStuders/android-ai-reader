@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -16,6 +17,8 @@ import com.example.readerapp.R;
 import com.example.readerapp.ui.customViews.ReaderView;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -80,10 +83,10 @@ public class EpubViewerActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
 
-        BottomAppBar bottomAppBar = binding.bottomAppBar;
-        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        BottomNavigationView bottomAppBar = binding.bottomAppBar;
+        bottomAppBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.prevChapter) {

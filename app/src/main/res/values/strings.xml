@@ -13,4 +13,8 @@
     <string name="select_chapter_button_text">Select chapter</string>
     <string name="text_bar_explain_button_text">Explain</string>
     <string name="text_bar_copy_button_text">Copy</string>
+
+    <string name="recent_files_button_text">Recent</string>
+    <string name="favorite_files_button_text">Favorites</string>
+    <string name="all_files_button_text">All files</string>
 </resources>

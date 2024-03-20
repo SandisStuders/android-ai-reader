@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,6 +64,50 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 intent.putExtra("TEST", "This my testen strinen");
                 context.startActivity(intent);
 
+            }
+        });
+
+        holder.fileCard.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+//                Toast toast = Toast.makeText(v.getContext() , "Long click!", Toast.LENGTH_SHORT);
+//                toast.show();
+                int position = holder.getAdapterPosition();
+                // Initialize the PopupMenu
+                PopupMenu popup = new PopupMenu(v.getContext(), v);
+                // Inflate the menu from xml
+                popup.inflate(R.menu.item_files_list_long_click_menu);
+
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Toast toastEn = Toast.makeText(v.getContext() , "HERE!!!", Toast.LENGTH_SHORT);
+                        toastEn.show();
+                        int itemId = item.getItemId();
+
+                        if (itemId == R.id.action_open) {
+                            Toast toast = Toast.makeText(v.getContext() , "Open", Toast.LENGTH_SHORT);
+                            toast.show();
+                        } else if (itemId == R.id.action_add_to_favorites) {
+                            Toast toast = Toast.makeText(v.getContext() , "Fav", Toast.LENGTH_SHORT);
+                            toast.show();
+                        } else if (itemId == R.id.action_remove_from_recent) {
+                            Toast toast = Toast.makeText(v.getContext() , "Recent", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+
+                        return true;
+                    }
+                });
+
+                popup.show();
+                // launch menu
+                return true;
+            }
+
+            @Override
+            public boolean onLongClickUseDefaultHapticFeedback(@NonNull View v) {
+                return View.OnLongClickListener.super.onLongClickUseDefaultHapticFeedback(v);
             }
         });
     }

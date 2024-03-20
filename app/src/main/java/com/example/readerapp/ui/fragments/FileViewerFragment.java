@@ -7,17 +7,23 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.readerapp.R;
 import com.example.readerapp.utils.HelperFunctions;
 import com.example.readerapp.data.models.ReadableFileDetails;
 import com.example.readerapp.databinding.FragmentFileViewerBinding;
 import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 
@@ -26,12 +32,14 @@ public class FileViewerFragment extends Fragment {
     private FragmentFileViewerBinding binding;
 
     private RecyclerView filesRecyclerView;
+    private BottomNavigationView bottomFileListSelectionBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentFileViewerBinding.inflate(inflater, container, false);
 
         filesRecyclerView = binding.filesRecyclerView;
+        bottomFileListSelectionBar = binding.bottomFileSelectionBar;
 
         ArrayList<ReadableFileDetails> fileDetails = getPdfFileList();
         if (fileDetails == null) {
@@ -44,6 +52,23 @@ public class FileViewerFragment extends Fragment {
         filesRecyclerView.setAdapter(adapter);
 
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        bottomFileListSelectionBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.recentFiles) {
+                    // recent files obtained from database
+                } else if (itemId == R.id.favoriteFiles) {
+                    // favorites files obtained from database
+                } else if (itemId == R.id.allFiles) {
+                    // all files obtained via getPdfFileList function
+                }
+
+                return false;
+            }
+        });
 
         return binding.getRoot();
     }

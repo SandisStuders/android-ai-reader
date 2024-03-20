@@ -17,13 +17,13 @@
             android:layout_marginBottom="70dp"
             android:clipToPadding="false" />
 
-        <com.google.android.material.bottomappbar.BottomAppBar
+        <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomAppBar"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_gravity="bottom"
             style="@style/Widget.Material3.BottomAppBar"
-            app:menu="@menu/bottom_app_bar" />
+            app:menu="@menu/epub_reader_bottom_bar" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
