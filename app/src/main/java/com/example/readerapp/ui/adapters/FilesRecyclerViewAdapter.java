@@ -1,7 +1,5 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.adapters;
 
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,23 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.example.readerapp.R;
+import com.example.readerapp.data.models.ReadableFileDetails;
+import com.example.readerapp.ui.activities.EpubViewerActivity;
 
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.domain.Resources;
-import nl.siegmann.epublib.epub.EpubReader;
+import java.util.ArrayList;
 
 public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecyclerViewAdapter.ViewHolder> {
 
@@ -38,7 +29,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.files_list_item,
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_files_list,
                 parent,
                 false);
 
@@ -69,27 +60,6 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 intent.putExtra("URI_STRING", uriString);
                 intent.putExtra("TEST", "This my testen strinen");
                 context.startActivity(intent);
-
-//                ContentResolver contentResolver = context.getContentResolver();
-
-//                try {
-//                    InputStream fileStream = contentResolver.openInputStream(fileUri);
-//                    Book book = (new EpubReader()).readEpub(fileStream);
-//                    Log.d("MyLogs", "author(s): " + book.getMetadata().getAuthors());
-//                    Log.d("MyLogs", "title: " + book.getTitle());
-//                    List<Resource> contents = book.getContents();
-//                    Log.d("MyLogs", "OBTAINED CONTENTS SIZE: " + contents.size());
-//                    String contentStringExample = contents.get(0).toString();
-//                    Log.d("MyLogs", "RESOURCE CONTENTS: " + contentStringExample);
-//
-//                    Resources resources = book.getResources();
-//                    Collection<Resource> resourceCollection = resources.getAll();
-//
-//
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-
 
             }
         });

@@ -16,7 +16,7 @@
         android:theme="@style/Theme.ReaderApp"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,19 +25,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ReaderActivity"
+            android:name=".ui.activities.ReaderActivity"
             android:exported="true">
         </activity>
         <activity
-            android:name=".FileViewerActivity"
+            android:name=".ui.activities.FileViewerActivity"
             android:exported="true">
         </activity>
         <activity
-            android:name=".EpubViewerActivity"
+            android:name=".ui.activities.EpubViewerActivity"
             android:exported="true">
         </activity>
         <activity
-            android:name=".ResponseViewerActivity"
+            android:name=".ui.activities.ResponseViewerActivity"
             android:exported="true">
         </activity>
     </application>

@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.activities;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +7,7 @@ import android.webkit.WebView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.example.readerapp.R;
 import com.example.readerapp.databinding.ActivityReaderBinding;
 
 import java.io.BufferedReader;

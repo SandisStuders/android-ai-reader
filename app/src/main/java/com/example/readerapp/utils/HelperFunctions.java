@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.utils;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

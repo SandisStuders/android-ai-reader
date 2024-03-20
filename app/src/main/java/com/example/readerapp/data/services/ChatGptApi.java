@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.data.services;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +12,7 @@ public class ChatGptApi {
     private final String apiEndpoint;
     private String model;
 
-    ChatGptApi() {
+    public ChatGptApi() {
         apiEndpoint = "https://api.openai.com/v1/chat/completions";
         apiKey = "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";
         model = "gpt-3.5-turbo";

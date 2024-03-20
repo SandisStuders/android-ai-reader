@@ -1,8 +1,10 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.readerapp.R;
 
 public class MainActivity extends AppCompatActivity {
 

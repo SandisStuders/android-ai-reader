@@ -8,7 +8,7 @@
         android:id="@+id/file_viewer_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.example.readerapp.FileViewerFragment"
+        android:name="com.example.readerapp.ui.fragments.FileViewerFragment"
         tools:layout="@layout/fragment_file_viewer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

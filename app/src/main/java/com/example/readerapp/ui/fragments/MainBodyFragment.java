@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.fragments;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -23,11 +23,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import com.example.readerapp.ui.activities.ReaderActivity;
 import com.example.readerapp.databinding.FragmentMainBodyBinding;
+import com.example.readerapp.ui.activities.FileViewerActivity;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class MainBodyFragment extends Fragment {
 

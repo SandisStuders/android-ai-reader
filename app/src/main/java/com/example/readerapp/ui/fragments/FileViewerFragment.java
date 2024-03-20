@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.fragments;
 
 import android.content.ContentUris;
 import android.database.Cursor;
@@ -14,7 +14,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.readerapp.utils.HelperFunctions;
+import com.example.readerapp.data.models.ReadableFileDetails;
 import com.example.readerapp.databinding.FragmentFileViewerBinding;
+import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;
 
 import java.util.ArrayList;
 

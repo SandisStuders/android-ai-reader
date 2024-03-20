@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.activities;
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -6,14 +6,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
+import com.example.readerapp.R;
+import com.example.readerapp.ui.customViews.ReaderView;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.google.android.material.bottomappbar.BottomAppBar;
 
@@ -32,8 +32,7 @@ public class EpubViewerActivity extends AppCompatActivity {
     ActivityEpubViewerBinding binding;
     int currentChapter;
     ArrayList<String> bookData;
-//    ReaderView epubViewer;
-    WebView epubViewer;
+    ReaderView epubViewer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,11 +120,6 @@ public class EpubViewerActivity extends AppCompatActivity {
                 "text/html",
                 "UTF-8",
                 null);
-
-//        epubViewer.loadData(dataPiece,
-//                "text/html",
-//                "utf-8"
-//        );
     }
 
 }

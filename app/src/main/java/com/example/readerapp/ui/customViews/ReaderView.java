@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.customViews;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -13,10 +13,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.readerapp.data.services.ChatGptApi;
+import com.example.readerapp.ui.activities.ResponseViewerActivity;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

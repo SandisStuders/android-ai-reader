@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.example.readerapp.R;
 import com.example.readerapp.databinding.ActivityResponseViewerBinding;
 
 public class ResponseViewerActivity extends AppCompatActivity {

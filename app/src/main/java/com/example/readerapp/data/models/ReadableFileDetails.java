@@ -1,4 +1,4 @@
-package com.example.readerapp;
+package com.example.readerapp.data.models;
 
 import android.net.Uri;
 

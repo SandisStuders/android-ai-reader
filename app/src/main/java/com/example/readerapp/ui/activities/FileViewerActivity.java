@@ -1,8 +1,10 @@
-package com.example.readerapp;
+package com.example.readerapp.ui.activities;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.readerapp.R;
 
 public class FileViewerActivity extends AppCompatActivity {
 
