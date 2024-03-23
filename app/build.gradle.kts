@@ -51,4 +51,7 @@ dependencies {
     }
     implementation("org.slf4j:slf4j-android:1.7.25")
 
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
 }

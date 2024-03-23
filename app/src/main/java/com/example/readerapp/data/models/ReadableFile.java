@@ -2,30 +2,48 @@ package com.example.readerapp.data.models;
 
 import android.net.Uri;
 
-import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-public class ReadableFileDetails {
-
+@Entity(tableName = "readableFiles")
+public class ReadableFile {
+    @PrimaryKey(autoGenerate = true)
+    private int fileId;
+    @ColumnInfo(name = "fileName")
     private String name;
-    private Uri contentUri;
+    @ColumnInfo(name = "contentUri")
+    private String contentUri;
+    @ColumnInfo(name = "creationDate")
     private String creationDate;
+    @ColumnInfo(name = "fileSize")
     private String fileSize;
+    @ColumnInfo(name = "fileType")
     private String fileType;
+    @ColumnInfo(name = "relativePath")
     private String relativePath;
 
 
-    public ReadableFileDetails(String name,
-                               Uri contentUri,
-                               String creationDate,
-                               String fileSize,
-                               String fileType,
-                               String relativePath) {
+    public ReadableFile(String name,
+                        String contentUri,
+                        String creationDate,
+                        String fileSize,
+                        String fileType,
+                        String relativePath) {
         this.name = name;
         this.contentUri = contentUri;
         this.creationDate = creationDate;
         this.fileSize = fileSize;
         this.fileType = fileType;
         this.relativePath = relativePath;
+    }
+
+    public int getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(int fileId) {
+        this.fileId = fileId;
     }
 
     public String getName() {
@@ -36,11 +54,11 @@ public class ReadableFileDetails {
         this.name = name;
     }
 
-    public Uri getContentUri() {
+    public String getContentUri() {
         return contentUri;
     }
 
-    public void setContentUri(Uri contentUri) {
+    public void setContentUri(String contentUri) {
         this.contentUri = contentUri;
     }
 
@@ -79,7 +97,8 @@ public class ReadableFileDetails {
     @Override
     public String toString() {
         return "ReadableFileDetails{" +
-                "name='" + name + '\'' +
+                "fileId=" + fileId +
+                ", name='" + name + '\'' +
                 ", contentUri=" + contentUri +
                 ", creationDate='" + creationDate + '\'' +
                 ", fileSize='" + fileSize + '\'' +

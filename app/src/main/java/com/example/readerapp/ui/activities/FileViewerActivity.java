@@ -13,8 +13,6 @@ public class FileViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_viewer);
 
-
-
     }
 
 }

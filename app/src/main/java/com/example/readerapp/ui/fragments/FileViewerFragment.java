@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,17 +18,24 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import com.example.readerapp.FileListViewModel;
 import com.example.readerapp.R;
+import com.example.readerapp.data.models.AppDatabase;
+import com.example.readerapp.data.models.ReadableFileDao;
 import com.example.readerapp.utils.HelperFunctions;
-import com.example.readerapp.data.models.ReadableFileDetails;
+import com.example.readerapp.data.models.ReadableFile;
 import com.example.readerapp.databinding.FragmentFileViewerBinding;
 import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
+import java.lang.reflect.Array;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class FileViewerFragment extends Fragment {
 
@@ -48,10 +54,26 @@ public class FileViewerFragment extends Fragment {
         bottomFileListSelectionBar = binding.bottomFileSelectionBar;
         fileListViewModel = new ViewModelProvider(this).get(FileListViewModel.class);
 
-        ArrayList<ReadableFileDetails> fileDetails = getPdfFileList();
+        ArrayList<ReadableFile> fileDetails = getPdfFileList();
         if (fileDetails == null) {
             Log.d("MyLogs", "Obtained fileDetails array is null");
         }
+
+        Log.d("MyLogs", "ABOUT TO ADD ITEMS: " + ZonedDateTime.now().toString());
+
+
+        AppDatabase db = Room.databaseBuilder(requireContext().getApplicationContext(),
+                AppDatabase.class, "database-name").build();
+
+        ReadableFileDao readableFileDao = db.readableFileDao();
+        readableFileDao.insertFiles(fileDetails);
+
+        Log.d("MyLogs", "ITEMS ADDED: " + ZonedDateTime.now().toString());
+
+        List<ReadableFile> allFiles = readableFileDao.getAllFiles();
+        Log.d("MyLogs", "ABOUT TO READ ITEMS: " + ZonedDateTime.now().toString());
+        Log.d("MyLogs", "ITEMS IN THE DATABASE: " + allFiles.size());
+        Log.d("MyLogs", "FIRST ITEM: " + allFiles.get(0).toString());
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter();
         adapter.setReadableFileDetails(fileDetails);
@@ -100,8 +122,8 @@ public class FileViewerFragment extends Fragment {
         binding = null;
     }
 
-    private ArrayList<ReadableFileDetails> getPdfFileList() {
-        ArrayList<ReadableFileDetails> pdfFiles = new ArrayList<>();
+    private ArrayList<ReadableFile> getPdfFileList() {
+        ArrayList<ReadableFile> pdfFiles = new ArrayList<>();
 
         String[] projection = new String[]{
                 MediaStore.Files.FileColumns._ID,
@@ -140,8 +162,8 @@ public class FileViewerFragment extends Fragment {
                     String adjustedFileSize = HelperFunctions.adjustByteSizeString(size);
                     String relativePath = cursor.getString(relativePathColumn);
 
-                    ReadableFileDetails fileDetails = new ReadableFileDetails(name,
-                            contentUri,
+                    ReadableFile fileDetails = new ReadableFile(name,
+                            contentUri.toString(),
                             creationDate,
                             adjustedFileSize,
 //                            "PDF",

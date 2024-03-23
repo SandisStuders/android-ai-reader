@@ -17,14 +17,14 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.ReadableFileDetails;
+import com.example.readerapp.data.models.ReadableFile;
 import com.example.readerapp.ui.activities.EpubViewerActivity;
 
 import java.util.ArrayList;
 
 public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<ReadableFileDetails> readableFileDetails = new ArrayList<>();
+    private ArrayList<ReadableFile> readableFileDetails = new ArrayList<>();
     private String currentListType = "RECENT";
 
     public FilesRecyclerViewAdapter() {
@@ -57,8 +57,8 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 int position = holder.getAdapterPosition();
 
                 Log.d("MyLogs", "BOOK TITLE: " + readableFileDetails.get(position).getName());
-                Uri fileUri = readableFileDetails.get(position).getContentUri();
-                String uriString = fileUri.toString();
+                String uriString = readableFileDetails.get(position).getContentUri();
+                Uri fileUri = Uri.parse(uriString);
 
                 Intent intent = new Intent(context, EpubViewerActivity.class);
                 intent.putExtra("URI_STRING", uriString);
@@ -133,7 +133,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         }
     }
 
-    public void setReadableFileDetails(ArrayList<ReadableFileDetails> readableFileDetails) {
+    public void setReadableFileDetails(ArrayList<ReadableFile> readableFileDetails) {
         Log.d("MyLogs", "READABLE FILE DETAILS SET!!");
         this.readableFileDetails = readableFileDetails;
         notifyDataSetChanged();
