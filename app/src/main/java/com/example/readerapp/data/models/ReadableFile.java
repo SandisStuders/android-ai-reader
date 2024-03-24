@@ -1,36 +1,60 @@
 package com.example.readerapp.data.models;
 
-import android.net.Uri;
-
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "readableFiles")
 public class ReadableFile {
+
     @PrimaryKey(autoGenerate = true)
-    private int fileId;
+    private int id;
+
     @ColumnInfo(name = "fileName")
-    private String name;
+    private String fileName;
+
     @ColumnInfo(name = "contentUri")
     private String contentUri;
+
     @ColumnInfo(name = "creationDate")
     private String creationDate;
+
     @ColumnInfo(name = "fileSize")
     private String fileSize;
+
     @ColumnInfo(name = "fileType")
     private String fileType;
+
     @ColumnInfo(name = "relativePath")
     private String relativePath;
 
+    @ColumnInfo(name = "mostRecentAccessTime")
+    private String mostRecentAccessTime;
 
-    public ReadableFile(String name,
+    @ColumnInfo(name = "isFavorite")
+    private boolean isFavorite;
+
+    public ReadableFile(String fileName, String contentUri, String creationDate, String fileSize, String fileType, String relativePath, String mostRecentAccessTime, boolean isFavorite) {
+        this.fileName = fileName;
+        this.contentUri = contentUri;
+        this.creationDate = creationDate;
+        this.fileSize = fileSize;
+        this.fileType = fileType;
+        this.relativePath = relativePath;
+        this.mostRecentAccessTime = mostRecentAccessTime;
+        this.isFavorite = isFavorite;
+    }
+
+    @Ignore
+    public ReadableFile(String fileName,
                         String contentUri,
                         String creationDate,
                         String fileSize,
                         String fileType,
                         String relativePath) {
-        this.name = name;
+        this.fileName = fileName;
         this.contentUri = contentUri;
         this.creationDate = creationDate;
         this.fileSize = fileSize;
@@ -38,20 +62,20 @@ public class ReadableFile {
         this.relativePath = relativePath;
     }
 
-    public int getFileId() {
-        return fileId;
+    public int getId() {
+        return id;
     }
 
-    public void setFileId(int fileId) {
-        this.fileId = fileId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getContentUri() {
@@ -94,16 +118,33 @@ public class ReadableFile {
         this.relativePath = relativePath;
     }
 
+    public String getMostRecentAccessTime() {
+        return mostRecentAccessTime;
+    }
+
+    public void setMostRecentAccessTime(String mostRecentAccessTime) {
+        this.mostRecentAccessTime = mostRecentAccessTime;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
     @Override
     public String toString() {
-        return "ReadableFileDetails{" +
-                "fileId=" + fileId +
-                ", name='" + name + '\'' +
-                ", contentUri=" + contentUri +
+        return "ReadableFile{" +
+                ", name='" + fileName + '\'' +
+                ", contentUri='" + contentUri + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", fileSize='" + fileSize + '\'' +
                 ", fileType='" + fileType + '\'' +
                 ", relativePath='" + relativePath + '\'' +
+                ", mostRecentAccessTime='" + mostRecentAccessTime + '\'' +
+                ", isFavorite=" + isFavorite +
                 '}';
     }
 }

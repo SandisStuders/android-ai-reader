@@ -1,9 +1,11 @@
 package com.example.readerapp.data.models;
 
 import androidx.annotation.RequiresPermission;
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -14,15 +16,12 @@ import java.util.List;
 public interface ReadableFileDao {
 
     @Query("SELECT * FROM readableFiles")
-    List<ReadableFile> getAllFiles();
+    LiveData<List<ReadableFile>> getAllFiles();
 
-    @Query("SELECT * FROM readableFiles WHERE fileId IN (:readableFileIds)")
-    List<ReadableFile> loadFilesByIds(int[] readableFileIds);
-
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertFiles(ReadableFile... readableFiles);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insertFiles(ArrayList<ReadableFile> readableFiles);
 
     @Update

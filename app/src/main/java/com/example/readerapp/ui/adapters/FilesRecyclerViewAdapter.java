@@ -44,7 +44,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.textFileName.setText(readableFileDetails.get(position).getName());
+        holder.textFileName.setText(readableFileDetails.get(position).getFileName());
         holder.textFileType.setText(readableFileDetails.get(position).getFileType());
         holder.textFileCreationDate.setText(readableFileDetails.get(position).getCreationDate());
         holder.textFileSize.setText(readableFileDetails.get(position).getFileSize());
@@ -56,7 +56,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 Context context = v.getContext();
                 int position = holder.getAdapterPosition();
 
-                Log.d("MyLogs", "BOOK TITLE: " + readableFileDetails.get(position).getName());
+                Log.d("MyLogs", "BOOK TITLE: " + readableFileDetails.get(position).getFileName());
                 String uriString = readableFileDetails.get(position).getContentUri();
                 Uri fileUri = Uri.parse(uriString);
 

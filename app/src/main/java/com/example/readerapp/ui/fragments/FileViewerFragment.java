@@ -18,24 +18,18 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
 import com.example.readerapp.FileListViewModel;
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.AppDatabase;
-import com.example.readerapp.data.models.ReadableFileDao;
-import com.example.readerapp.utils.HelperFunctions;
 import com.example.readerapp.data.models.ReadableFile;
+import com.example.readerapp.data.models.ReadableFileViewModel;
 import com.example.readerapp.databinding.FragmentFileViewerBinding;
 import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;
+import com.example.readerapp.utils.HelperFunctions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
-import java.lang.reflect.Array;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class FileViewerFragment extends Fragment {
 
@@ -58,28 +52,12 @@ public class FileViewerFragment extends Fragment {
         if (fileDetails == null) {
             Log.d("MyLogs", "Obtained fileDetails array is null");
         }
-
-        Log.d("MyLogs", "ABOUT TO ADD ITEMS: " + ZonedDateTime.now().toString());
-
-
-        AppDatabase db = Room.databaseBuilder(requireContext().getApplicationContext(),
-                AppDatabase.class, "database-name").build();
-
-        ReadableFileDao readableFileDao = db.readableFileDao();
-        readableFileDao.insertFiles(fileDetails);
-
-        Log.d("MyLogs", "ITEMS ADDED: " + ZonedDateTime.now().toString());
-
-        List<ReadableFile> allFiles = readableFileDao.getAllFiles();
-        Log.d("MyLogs", "ABOUT TO READ ITEMS: " + ZonedDateTime.now().toString());
-        Log.d("MyLogs", "ITEMS IN THE DATABASE: " + allFiles.size());
-        Log.d("MyLogs", "FIRST ITEM: " + allFiles.get(0).toString());
+        Log.d("MyLogs", "FILE DETAILS SIZE: " + fileDetails.size());
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter();
         adapter.setReadableFileDetails(fileDetails);
 
         filesRecyclerView.setAdapter(adapter);
-
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         bottomFileListSelectionBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -144,6 +122,7 @@ public class FileViewerFragment extends Fragment {
 
         try (Cursor cursor = getContext().getContentResolver().query(queryUri, projection, selection, selectionArgs, null)) {
             if (cursor != null && cursor.moveToFirst()) {
+                Log.d("MyLogs", "CURSOR NOT NULL");
                 String[] colNames = cursor.getColumnNames();
 
                 int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
