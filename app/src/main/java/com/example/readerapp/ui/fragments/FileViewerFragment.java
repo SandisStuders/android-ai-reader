@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileViewerFragment extends Fragment {
 
@@ -40,6 +42,8 @@ public class FileViewerFragment extends Fragment {
 
     private FileListViewModel fileListViewModel;
 
+    private ReadableFileViewModel mReadableFileViewModel;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentFileViewerBinding.inflate(inflater, container, false);
@@ -47,6 +51,7 @@ public class FileViewerFragment extends Fragment {
         filesRecyclerView = binding.filesRecyclerView;
         bottomFileListSelectionBar = binding.bottomFileSelectionBar;
         fileListViewModel = new ViewModelProvider(this).get(FileListViewModel.class);
+        mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
 
         ArrayList<ReadableFile> fileDetails = getPdfFileList();
         if (fileDetails == null) {
@@ -54,8 +59,16 @@ public class FileViewerFragment extends Fragment {
         }
         Log.d("MyLogs", "FILE DETAILS SIZE: " + fileDetails.size());
 
+        mReadableFileViewModel.insert(fileDetails);
+        ArrayList<ReadableFile> dataReadableFiles = (ArrayList<ReadableFile>) mReadableFileViewModel.getAllReadableFiles().getValue();
+
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter();
-        adapter.setReadableFileDetails(fileDetails);
+        adapter.setReadableFileDetails(dataReadableFiles);
+
+        mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), databaseReadableFiles -> {
+            // Update the cached copy of the words in the adapter.
+            adapter.setReadableFileDetails((ArrayList<ReadableFile>) databaseReadableFiles);
+        });
 
         filesRecyclerView.setAdapter(adapter);
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

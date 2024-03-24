@@ -28,6 +28,6 @@ public interface ReadableFileDao {
     public void updateFile(ReadableFile... readableFiles);
 
     @Delete
-    void deleteFile(ReadableFile user);
+    void deleteFile(ReadableFile readableFile);
 
 }

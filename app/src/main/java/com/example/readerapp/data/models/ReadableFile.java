@@ -6,12 +6,12 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "readableFiles")
+@Entity(tableName = "readableFiles", primaryKeys = {"fileName", "relativePath"})
 public class ReadableFile {
 
-    @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @NonNull
     @ColumnInfo(name = "fileName")
     private String fileName;
 
@@ -27,6 +27,7 @@ public class ReadableFile {
     @ColumnInfo(name = "fileType")
     private String fileType;
 
+    @NonNull
     @ColumnInfo(name = "relativePath")
     private String relativePath;
 
