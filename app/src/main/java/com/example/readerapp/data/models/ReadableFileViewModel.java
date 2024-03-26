@@ -14,23 +14,23 @@ public class ReadableFileViewModel extends AndroidViewModel {
 
     private final LiveData<List<ReadableFile>> mAllReadableFiles;
     private final LiveData<List<ReadableFile>> mFavoriteFiles;
+    private final LiveData<List<ReadableFile>> mRecentFiles;
 
     public ReadableFileViewModel (Application application) {
         super(application);
         mRepository = new ReadableFileRepository(application);
         mAllReadableFiles = mRepository.getAllReadableFiles();
         mFavoriteFiles = mRepository.getFavoriteFiles();
+        mRecentFiles = mRepository.getRecentFiles();
     }
 
     public LiveData<List<ReadableFile>> getAllReadableFiles() { return mAllReadableFiles; }
 
-    public LiveData<List<ReadableFile>> getAllReadableFilesAlt() { return mRepository.getAllReadableFilesAlt(); }
-
-    public void insert(ArrayList<ReadableFile> readableFile) { mRepository.insert(readableFile); }
-
     public LiveData<List<ReadableFile>> getFavoriteFiles() {return mFavoriteFiles;}
 
-    public LiveData<List<ReadableFile>> getRecentFiles() {return null;}
+    public LiveData<List<ReadableFile>> getRecentFiles() {return mRecentFiles;}
+
+    public void insert(ArrayList<ReadableFile> readableFile) { mRepository.insert(readableFile); }
 
     public void update(ReadableFile readableFile) {
         mRepository.update(readableFile);

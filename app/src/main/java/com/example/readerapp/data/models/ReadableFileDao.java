@@ -21,7 +21,7 @@ public interface ReadableFileDao {
     @Query("SELECT * FROM readableFiles WHERE isFavorite = 1")
     LiveData<List<ReadableFile>> getFavoriteFiles();
 
-    @Query("SELECT * FROM readableFiles")
+    @Query("SELECT * FROM readableFiles WHERE mostRecentAccessTime > 0 ORDER BY mostRecentAccessTime DESC LIMIT 15")
     LiveData<List<ReadableFile>> getRecentFiles();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

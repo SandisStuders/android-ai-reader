@@ -12,23 +12,23 @@ public class ReadableFileRepository {
     private ReadableFileDao mReadableFileDao;
     private LiveData<List<ReadableFile>> mAllReadableFiles;
     private LiveData<List<ReadableFile>> mFavoriteFiles;
+    private LiveData<List<ReadableFile>> mRecentFiles;
 
     ReadableFileRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mReadableFileDao = db.readableFileDao();
         mAllReadableFiles = mReadableFileDao.getAllFiles();
         mFavoriteFiles = mReadableFileDao.getFavoriteFiles();
+        mRecentFiles = mReadableFileDao.getRecentFiles();
     }
 
     LiveData<List<ReadableFile>> getAllReadableFiles() {
         return mAllReadableFiles;
     }
 
-    LiveData<List<ReadableFile>> getAllReadableFilesAlt() {
-        return mReadableFileDao.getAllFiles();
-    }
-
     public LiveData<List<ReadableFile>> getFavoriteFiles() {return mFavoriteFiles;}
+
+    public LiveData<List<ReadableFile>> getRecentFiles() {return mRecentFiles;}
 
     void insert(ReadableFile readableFile) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
@@ -47,7 +47,5 @@ public class ReadableFileRepository {
             mReadableFileDao.updateFile(readableFile);
         });
     }
-
-    public LiveData<List<ReadableFile>> getRecentFiles() {return null;}
 
 }

@@ -32,12 +32,12 @@ public class ReadableFile {
     private String relativePath;
 
     @ColumnInfo(name = "mostRecentAccessTime")
-    private String mostRecentAccessTime;
+    private long mostRecentAccessTime;
 
     @ColumnInfo(name = "isFavorite")
     private boolean isFavorite;
 
-    public ReadableFile(String fileName, String contentUri, String creationDate, String fileSize, String fileType, String relativePath, String mostRecentAccessTime, boolean isFavorite) {
+    public ReadableFile(String fileName, String contentUri, String creationDate, String fileSize, String fileType, String relativePath, long mostRecentAccessTime, boolean isFavorite) {
         this.fileName = fileName;
         this.contentUri = contentUri;
         this.creationDate = creationDate;
@@ -119,11 +119,11 @@ public class ReadableFile {
         this.relativePath = relativePath;
     }
 
-    public String getMostRecentAccessTime() {
+    public long getMostRecentAccessTime() {
         return mostRecentAccessTime;
     }
 
-    public void setMostRecentAccessTime(String mostRecentAccessTime) {
+    public void setMostRecentAccessTime(long mostRecentAccessTime) {
         this.mostRecentAccessTime = mostRecentAccessTime;
     }
 

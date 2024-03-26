@@ -32,6 +32,7 @@ import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FileViewerFragment extends Fragment implements FilesRecyclerViewAdapter.FileOptionListener {
 
@@ -63,16 +64,18 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         Log.d("MyLogs", "FILE DETAILS SIZE: " + fileDetails.size());
 
         mReadableFileViewModel.insert(fileDetails);
-        ArrayList<ReadableFile> dataReadableFiles = (ArrayList<ReadableFile>) mReadableFileViewModel.getAllReadableFiles().getValue();
+//        ArrayList<ReadableFile> dataReadableFiles = (ArrayList<ReadableFile>) mReadableFileViewModel.getAllReadableFiles().getValue();
 //        List<ReadableFile> favoriteFiles = mReadableFileViewModel.getFavoriteFiles().getValue();
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
-        adapter.setReadableFileDetails(dataReadableFiles);
+//        adapter.setReadableFileDetails(dataReadableFiles);
+        adapter.setReadableFileDetails(recentFileDetails);
+        Log.d("MyLogs", "OnCreate SET EXECUTED");
 
-        mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), databaseReadableFiles -> {
-            // Update the cached copy of the words in the adapter.
-            adapter.setReadableFileDetails((ArrayList<ReadableFile>) databaseReadableFiles);
-        });
+//        mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), databaseReadableFiles -> {
+//            // Update the cached copy of the words in the adapter.
+//            adapter.setReadableFileDetails((ArrayList<ReadableFile>) databaseReadableFiles);
+//        });
 
         filesRecyclerView.setAdapter(adapter);
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -109,6 +112,9 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             public void onChanged(List<ReadableFile> readableFiles) {
                 if (readableFiles != null) {
                     favoriteFileDetails = (ArrayList<ReadableFile>) readableFiles;
+                    if (Objects.equals(fileListViewModel.getCurrentListType().getValue(), "FAVORITE")) {
+                        adapter.setReadableFileDetails(favoriteFileDetails);
+                    }
                 }
             }
         });
@@ -118,6 +124,18 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             public void onChanged(List<ReadableFile> readableFiles) {
                 if (readableFiles != null) {
                     allFileDetails = (ArrayList<ReadableFile>) readableFiles;
+                }
+            }
+        });
+
+        mReadableFileViewModel.getRecentFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
+            @Override
+            public void onChanged(List<ReadableFile> readableFiles) {
+                if (readableFiles != null) {
+                    recentFileDetails = (ArrayList<ReadableFile>) readableFiles;
+                    if (Objects.equals(fileListViewModel.getCurrentListType().getValue(), "RECENT")) {
+                        adapter.setReadableFileDetails(recentFileDetails);
+                    }
                 }
             }
         });
@@ -206,7 +224,9 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     @Override
     public void removeFromRecent(ReadableFile readableFile) {
-        Log.d("MyLogs", "CHECK! " + readableFile.toString());
+        readableFile.setMostRecentAccessTime(0);
+        mReadableFileViewModel.update(readableFile);
+        Log.d("MyLogs", "REMOVING FROM RECENT: " + readableFile.getFileName());
     }
 
     @Override
@@ -216,4 +236,10 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         Log.d("MyLogs", "REMOVED FROM FAVORITES: " + readableFile.toString());
     }
 
+    @Override
+    public void fileOpened(ReadableFile readableFile) {
+        long currentTimeMillis = System.currentTimeMillis();
+        readableFile.setMostRecentAccessTime(currentTimeMillis);
+        mReadableFileViewModel.update(readableFile);
+    }
 }

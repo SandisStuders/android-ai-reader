@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {ReadableFile.class}, version = 6)
+@Database(entities = {ReadableFile.class}, version = 7)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ReadableFileDao readableFileDao();
 

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,6 +61,10 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
             public void onClick(View v) {
                 Context context = v.getContext();
                 int position = holder.getAdapterPosition();
+
+                ReadableFile readableFile = readableFileDetails.get(position);
+                Log.d("MyLogs", "FILE DETAILS BEFORE OPENING: " + readableFile.toString());
+                listener.fileOpened(readableFile);
 
                 Log.d("MyLogs", "BOOK TITLE: " + readableFileDetails.get(position).getFileName());
                 String uriString = readableFileDetails.get(position).getContentUri();
@@ -134,7 +139,11 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
     }
 
     public void setReadableFileDetails(ArrayList<ReadableFile> readableFileDetails) {
-        Log.d("MyLogs", "READABLE FILE DETAILS SET!!");
+        if (readableFileDetails != null) {
+            Log.d("MyLogs", "SETTING NEW READABLE DETAILS: " + readableFileDetails.size());
+        } else {
+            Log.d("MyLogs", "NULL DETAILS SET!");
+        }
         this.readableFileDetails = readableFileDetails;
         notifyDataSetChanged();
     }
@@ -169,5 +178,6 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         void addToFavorites(ReadableFile readableFile);
         void removeFromRecent(ReadableFile readableFile);
         void removeFromFavorites(ReadableFile readableFile);
+        void fileOpened(ReadableFile readableFile);
     }
 }
