@@ -33,7 +33,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileViewerFragment extends Fragment {
+public class FileViewerFragment extends Fragment implements FilesRecyclerViewAdapter.FileOptionListener {
 
     private FragmentFileViewerBinding binding;
 
@@ -41,6 +41,9 @@ public class FileViewerFragment extends Fragment {
     private BottomNavigationView bottomFileListSelectionBar;
 
     private FileListViewModel fileListViewModel;
+    private ArrayList<ReadableFile> favoriteFileDetails = new ArrayList<>();
+    private ArrayList<ReadableFile> allFileDetails = new ArrayList<>();
+    private ArrayList<ReadableFile> recentFileDetails = new ArrayList<>();
 
     private ReadableFileViewModel mReadableFileViewModel;
 
@@ -61,8 +64,9 @@ public class FileViewerFragment extends Fragment {
 
         mReadableFileViewModel.insert(fileDetails);
         ArrayList<ReadableFile> dataReadableFiles = (ArrayList<ReadableFile>) mReadableFileViewModel.getAllReadableFiles().getValue();
+//        List<ReadableFile> favoriteFiles = mReadableFileViewModel.getFavoriteFiles().getValue();
 
-        FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter();
+        FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
         adapter.setReadableFileDetails(dataReadableFiles);
 
         mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), databaseReadableFiles -> {
@@ -81,18 +85,40 @@ public class FileViewerFragment extends Fragment {
                 if (itemId == R.id.recentFiles) {
                     // recent files obtained from database
                     fileListViewModel.setCurrentListType("RECENT");
+                    adapter.setReadableFileDetails(recentFileDetails);
                     return true;
                 } else if (itemId == R.id.favoriteFiles) {
-                    // favorites files obtained from database
-                    fileListViewModel.setCurrentListType("FAVORITES");
+//                    Log.d("MyLogs", "FAVORITE FILES SIZE: " + favoriteFiles.size());
+                    fileListViewModel.setCurrentListType("FAVORITE");
+                    adapter.setReadableFileDetails(favoriteFileDetails);
+
                     return true;
                 } else if (itemId == R.id.allFiles) {
                     // all files obtained via getPdfFileList function
                     fileListViewModel.setCurrentListType("ALL");
+                    adapter.setReadableFileDetails(allFileDetails);
                     return true;
                 }
 
                 return false;
+            }
+        });
+
+        mReadableFileViewModel.getFavoriteFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
+            @Override
+            public void onChanged(List<ReadableFile> readableFiles) {
+                if (readableFiles != null) {
+                    favoriteFileDetails = (ArrayList<ReadableFile>) readableFiles;
+                }
+            }
+        });
+
+        mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
+            @Override
+            public void onChanged(List<ReadableFile> readableFiles) {
+                if (readableFiles != null) {
+                    allFileDetails = (ArrayList<ReadableFile>) readableFiles;
+                }
             }
         });
 
@@ -169,6 +195,25 @@ public class FileViewerFragment extends Fragment {
         }
 
         return pdfFiles;
+    }
+
+    @Override
+    public void addToFavorites(ReadableFile readableFile) {
+        readableFile.setFavorite(true);
+        mReadableFileViewModel.update(readableFile);
+        Log.d("MyLogs", "ADDED TO FAVORITES: " + readableFile.toString());
+    }
+
+    @Override
+    public void removeFromRecent(ReadableFile readableFile) {
+        Log.d("MyLogs", "CHECK! " + readableFile.toString());
+    }
+
+    @Override
+    public void removeFromFavorites(ReadableFile readableFile) {
+        readableFile.setFavorite(false);
+        mReadableFileViewModel.update(readableFile);
+        Log.d("MyLogs", "REMOVED FROM FAVORITES: " + readableFile.toString());
     }
 
 }

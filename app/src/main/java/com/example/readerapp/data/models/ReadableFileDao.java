@@ -18,6 +18,12 @@ public interface ReadableFileDao {
     @Query("SELECT * FROM readableFiles")
     LiveData<List<ReadableFile>> getAllFiles();
 
+    @Query("SELECT * FROM readableFiles WHERE isFavorite = 1")
+    LiveData<List<ReadableFile>> getFavoriteFiles();
+
+    @Query("SELECT * FROM readableFiles")
+    LiveData<List<ReadableFile>> getRecentFiles();
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertFiles(ReadableFile... readableFiles);
 

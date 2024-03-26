@@ -20,14 +20,19 @@ import com.example.readerapp.R;
 import com.example.readerapp.data.models.ReadableFile;
 import com.example.readerapp.ui.activities.EpubViewerActivity;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<ReadableFile> readableFileDetails = new ArrayList<>();
     private String currentListType = "RECENT";
+    private FileOptionListener listener;
 
-    public FilesRecyclerViewAdapter() {
+
+    public FilesRecyclerViewAdapter(FileOptionListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -71,15 +76,13 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         holder.fileCard.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-//                Toast toast = Toast.makeText(v.getContext() , "Long click!", Toast.LENGTH_SHORT);
-//                toast.show();
                 int position = holder.getAdapterPosition();
                 // Initialize the PopupMenu
                 PopupMenu popup = new PopupMenu(v.getContext(), v);
 
-                if (currentListType == "RECENT") {
+                if (Objects.equals(currentListType, "RECENT")) {
                     popup.inflate(R.menu.item_files_list_long_click_menu_recent);
-                } else if (currentListType == "FAVORITE") {
+                } else if (Objects.equals(currentListType, "FAVORITE")) {
                     popup.inflate(R.menu.item_files_list_long_click_menu_favorite);
                 } else {
                     popup.inflate(R.menu.item_files_list_long_click_menu_all);
@@ -96,14 +99,11 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                             Toast toast = Toast.makeText(v.getContext() , "Open", Toast.LENGTH_SHORT);
                             toast.show();
                         } else if (itemId == R.id.action_add_to_favorites) {
-                            Toast toast = Toast.makeText(v.getContext() , "Fav", Toast.LENGTH_SHORT);
-                            toast.show();
+                            listener.addToFavorites(readableFileDetails.get(position));
                         } else if (itemId == R.id.action_remove_from_recent) {
-                            Toast toast = Toast.makeText(v.getContext() , "Recent", Toast.LENGTH_SHORT);
-                            toast.show();
+                            listener.removeFromRecent(readableFileDetails.get(position));
                         } else if (itemId == R.id.action_remove_from_favorites) {
-                            Toast toast = Toast.makeText(v.getContext() , "Fav remove", Toast.LENGTH_SHORT);
-                            toast.show();
+                            listener.removeFromFavorites(readableFileDetails.get(position));
                         }
 
                         return true;
@@ -163,5 +163,11 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
 
     public void setCurrentListType(String currentListType) {
         this.currentListType = currentListType;
+    }
+
+    public interface FileOptionListener {
+        void addToFavorites(ReadableFile readableFile);
+        void removeFromRecent(ReadableFile readableFile);
+        void removeFromFavorites(ReadableFile readableFile);
     }
 }
