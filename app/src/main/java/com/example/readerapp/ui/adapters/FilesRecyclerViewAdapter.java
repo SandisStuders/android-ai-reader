@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +56,15 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         holder.textFileCreationDate.setText(readableFileDetails.get(position).getCreationDate());
         holder.textFileSize.setText(readableFileDetails.get(position).getFileSize());
         holder.textFileRelativePath.setText(readableFileDetails.get(position).getRelativePath());
+
+        String fileType = readableFileDetails.get(position).getFileType();
+        if (Objects.equals(fileType, "EPUB")) {
+            holder.thumbnail.setImageResource(R.drawable.epub_default_thumbnail);
+        } else if (Objects.equals(fileType, "PDF")) {
+            holder.thumbnail.setImageResource(R.drawable.pdf_default_thumbnail);
+        } else {
+            holder.thumbnail.setImageResource(R.drawable.default_thumbnail);
+        }
 
         holder.fileCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +163,8 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         private TextView textFileName, textFileType, textFileCreationDate, textFileSize,
                 textFileRelativePath;
 
+        private ImageView thumbnail;
+
         private CardView fileCard;
 
         public ViewHolder(@NonNull View itemView) {
@@ -163,6 +175,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
             textFileSize = itemView.findViewById(R.id.file_size);
             textFileRelativePath = itemView.findViewById(R.id.file_relative_path);
             fileCard = itemView.findViewById(R.id.file_card);
+            thumbnail = itemView.findViewById(R.id.image_thumbnail);
         }
     }
 
