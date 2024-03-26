@@ -69,6 +69,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
 //        adapter.setReadableFileDetails(dataReadableFiles);
+        fileListViewModel.setCurrentListType("RECENT");
         adapter.setReadableFileDetails(recentFileDetails);
         Log.d("MyLogs", "OnCreate SET EXECUTED");
 
