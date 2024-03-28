@@ -86,7 +86,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
             @Override
             public boolean onLongClick(View v) {
                 int position = holder.getAdapterPosition();
-                // Initialize the PopupMenu
+
                 PopupMenu popup = new PopupMenu(v.getContext(), v);
 
                 if (Objects.equals(currentListType, "RECENT")) {
@@ -100,8 +100,6 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        Toast toastEn = Toast.makeText(v.getContext() , currentListType, Toast.LENGTH_SHORT);
-                        toastEn.show();
                         int itemId = item.getItemId();
 
                         if (itemId == R.id.action_open) {
@@ -120,7 +118,6 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 });
 
                 popup.show();
-                // launch menu
                 return true;
             }
 

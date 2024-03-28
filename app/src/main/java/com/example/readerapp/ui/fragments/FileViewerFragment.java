@@ -12,14 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.readerapp.FileListViewModel;
 import com.example.readerapp.R;
 import com.example.readerapp.data.models.ReadableFile;
 import com.example.readerapp.data.models.ReadableFileViewModel;
@@ -39,13 +37,12 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     private RecyclerView filesRecyclerView;
     private BottomNavigationView bottomFileListSelectionBar;
-
-    private FileListViewModel fileListViewModel;
     private ArrayList<ReadableFile> favoriteFileDetails = new ArrayList<>();
     private ArrayList<ReadableFile> allFileDetails = new ArrayList<>();
     private ArrayList<ReadableFile> recentFileDetails = new ArrayList<>();
 
     private ReadableFileViewModel mReadableFileViewModel;
+    private String currentListType;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,7 +51,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         filesRecyclerView = binding.filesRecyclerView;
         bottomFileListSelectionBar = binding.bottomFileSelectionBar;
 
-        fileListViewModel = new ViewModelProvider(this).get(FileListViewModel.class);
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
 
         ArrayList<ReadableFile> fileDetails = getPdfFileList();
@@ -62,8 +58,9 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         mReadableFileViewModel.insert(fileDetails);
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
-        fileListViewModel.setCurrentListType("RECENT");
+        currentListType = "RECENT";
         adapter.setReadableFileDetails(recentFileDetails);
+        adapter.setCurrentListType(currentListType);
 
         filesRecyclerView.setAdapter(adapter);
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -74,15 +71,18 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.recentFiles) {
-                    fileListViewModel.setCurrentListType("RECENT");
+                    currentListType = "RECENT";
+                    adapter.setCurrentListType(currentListType);
                     adapter.setReadableFileDetails(recentFileDetails);
                     return true;
                 } else if (itemId == R.id.favoriteFiles) {
-                    fileListViewModel.setCurrentListType("FAVORITE");
+                    currentListType = "FAVORITE";
+                    adapter.setCurrentListType(currentListType);
                     adapter.setReadableFileDetails(favoriteFileDetails);
                     return true;
                 } else if (itemId == R.id.allFiles) {
-                    fileListViewModel.setCurrentListType("ALL");
+                    currentListType = "ALL";
+                    adapter.setCurrentListType(currentListType);
                     adapter.setReadableFileDetails(allFileDetails);
                     return true;
                 }
@@ -96,7 +96,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             public void onChanged(List<ReadableFile> readableFiles) {
                 if (readableFiles != null) {
                     favoriteFileDetails = (ArrayList<ReadableFile>) readableFiles;
-                    if (Objects.equals(fileListViewModel.getCurrentListType().getValue(), "FAVORITE")) {
+                    if (Objects.equals(currentListType, "FAVORITE")) {
                         adapter.setReadableFileDetails(favoriteFileDetails);
                     }
                 }
@@ -117,17 +117,10 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             public void onChanged(List<ReadableFile> readableFiles) {
                 if (readableFiles != null) {
                     recentFileDetails = (ArrayList<ReadableFile>) readableFiles;
-                    if (Objects.equals(fileListViewModel.getCurrentListType().getValue(), "RECENT")) {
+                    if (Objects.equals(currentListType, "RECENT")) {
                         adapter.setReadableFileDetails(recentFileDetails);
                     }
                 }
-            }
-        });
-
-        fileListViewModel.getCurrentListType().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String currentListType) {
-                adapter.setCurrentListType(currentListType);
             }
         });
 
