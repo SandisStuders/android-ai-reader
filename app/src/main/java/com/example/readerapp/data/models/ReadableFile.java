@@ -52,21 +52,6 @@ public class ReadableFile {
         this.isFavorite = isFavorite;
     }
 
-    @Ignore
-    public ReadableFile(@NonNull String fileName,
-                        String contentUri,
-                        String creationDate,
-                        String fileSize,
-                        String fileType,
-                        @NonNull String relativePath) {
-        this.fileName = fileName;
-        this.contentUri = contentUri;
-        this.creationDate = creationDate;
-        this.fileSize = fileSize;
-        this.fileType = fileType;
-        this.relativePath = relativePath;
-    }
-
     @NonNull
     public String getFileName() {
         return fileName;

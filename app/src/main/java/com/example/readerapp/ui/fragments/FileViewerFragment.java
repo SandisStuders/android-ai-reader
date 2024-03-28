@@ -205,7 +205,9 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                             adjustedFileSize,
 //                            "PDF",
                             "EPUB",
-                            relativePath);
+                            relativePath,
+                            0,
+                            false);
                     pdfFiles.add(fileDetails);
                 } while (cursor.moveToNext());
             }
