@@ -6,13 +6,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
 
-public class ChatGptApi {
+public class ChatGptApiService {
 
     private final String apiKey;
     private final String apiEndpoint;
     private String model;
 
-    public ChatGptApi() {
+    public ChatGptApiService() {
         apiEndpoint = "https://api.openai.com/v1/chat/completions";
         apiKey = "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";
         model = "gpt-3.5-turbo";

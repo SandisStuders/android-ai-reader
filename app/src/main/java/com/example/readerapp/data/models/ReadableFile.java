@@ -3,7 +3,6 @@ package com.example.readerapp.data.models;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 
 @Entity(tableName = "readableFiles", primaryKeys = {"fileName", "relativePath"})
 public class ReadableFile {

@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,29 +53,17 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
         filesRecyclerView = binding.filesRecyclerView;
         bottomFileListSelectionBar = binding.bottomFileSelectionBar;
+
         fileListViewModel = new ViewModelProvider(this).get(FileListViewModel.class);
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
 
         ArrayList<ReadableFile> fileDetails = getPdfFileList();
-        if (fileDetails == null) {
-            Log.d("MyLogs", "Obtained fileDetails array is null");
-        }
-        Log.d("MyLogs", "FILE DETAILS SIZE: " + fileDetails.size());
 
         mReadableFileViewModel.insert(fileDetails);
-//        ArrayList<ReadableFile> dataReadableFiles = (ArrayList<ReadableFile>) mReadableFileViewModel.getAllReadableFiles().getValue();
-//        List<ReadableFile> favoriteFiles = mReadableFileViewModel.getFavoriteFiles().getValue();
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
-//        adapter.setReadableFileDetails(dataReadableFiles);
         fileListViewModel.setCurrentListType("RECENT");
         adapter.setReadableFileDetails(recentFileDetails);
-        Log.d("MyLogs", "OnCreate SET EXECUTED");
-
-//        mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), databaseReadableFiles -> {
-//            // Update the cached copy of the words in the adapter.
-//            adapter.setReadableFileDetails((ArrayList<ReadableFile>) databaseReadableFiles);
-//        });
 
         filesRecyclerView.setAdapter(adapter);
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -87,18 +74,14 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.recentFiles) {
-                    // recent files obtained from database
                     fileListViewModel.setCurrentListType("RECENT");
                     adapter.setReadableFileDetails(recentFileDetails);
                     return true;
                 } else if (itemId == R.id.favoriteFiles) {
-//                    Log.d("MyLogs", "FAVORITE FILES SIZE: " + favoriteFiles.size());
                     fileListViewModel.setCurrentListType("FAVORITE");
                     adapter.setReadableFileDetails(favoriteFileDetails);
-
                     return true;
                 } else if (itemId == R.id.allFiles) {
-                    // all files obtained via getPdfFileList function
                     fileListViewModel.setCurrentListType("ALL");
                     adapter.setReadableFileDetails(allFileDetails);
                     return true;
@@ -144,7 +127,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         fileListViewModel.getCurrentListType().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String currentListType) {
-                // Here you can notify your adapter about the list type change
                 adapter.setCurrentListType(currentListType);
             }
         });
@@ -222,21 +204,18 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
     public void addToFavorites(ReadableFile readableFile) {
         readableFile.setFavorite(true);
         mReadableFileViewModel.update(readableFile);
-        Log.d("MyLogs", "ADDED TO FAVORITES: " + readableFile.toString());
-    }
-
-    @Override
-    public void removeFromRecent(ReadableFile readableFile) {
-        readableFile.setMostRecentAccessTime(0);
-        mReadableFileViewModel.update(readableFile);
-        Log.d("MyLogs", "REMOVING FROM RECENT: " + readableFile.getFileName());
     }
 
     @Override
     public void removeFromFavorites(ReadableFile readableFile) {
         readableFile.setFavorite(false);
         mReadableFileViewModel.update(readableFile);
-        Log.d("MyLogs", "REMOVED FROM FAVORITES: " + readableFile.toString());
+    }
+
+    @Override
+    public void removeFromRecent(ReadableFile readableFile) {
+        readableFile.setMostRecentAccessTime(0);
+        mReadableFileViewModel.update(readableFile);
     }
 
     @Override

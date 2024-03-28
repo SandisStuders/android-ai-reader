@@ -26,11 +26,13 @@ public class ReadableFileViewModel extends AndroidViewModel {
 
     public LiveData<List<ReadableFile>> getAllReadableFiles() { return mAllReadableFiles; }
 
-    public LiveData<List<ReadableFile>> getFavoriteFiles() {return mFavoriteFiles;}
+    public LiveData<List<ReadableFile>> getFavoriteFiles() { return mFavoriteFiles; }
 
-    public LiveData<List<ReadableFile>> getRecentFiles() {return mRecentFiles;}
+    public LiveData<List<ReadableFile>> getRecentFiles() { return mRecentFiles; }
 
-    public void insert(ArrayList<ReadableFile> readableFile) { mRepository.insert(readableFile); }
+    public void insert(ReadableFile readableFile) { mRepository.insert(readableFile); }
+
+    public void insert(ArrayList<ReadableFile> readableFiles) { mRepository.insert(readableFiles); }
 
     public void update(ReadableFile readableFile) {
         mRepository.update(readableFile);

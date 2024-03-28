@@ -1,6 +1,5 @@
 package com.example.readerapp.data.models;
 
-import androidx.annotation.RequiresPermission;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -28,10 +27,10 @@ public interface ReadableFileDao {
     void insertFiles(ReadableFile... readableFiles);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public void insertFiles(ArrayList<ReadableFile> readableFiles);
+    void insertFiles(ArrayList<ReadableFile> readableFiles);
 
     @Update
-    public void updateFile(ReadableFile... readableFiles);
+    void updateFile(ReadableFile... readableFiles);
 
     @Delete
     void deleteFile(ReadableFile readableFile);

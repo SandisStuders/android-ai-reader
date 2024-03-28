@@ -44,9 +44,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 parent,
                 false);
 
-        ViewHolder holder = new ViewHolder(view);
-
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -73,16 +71,12 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                 int position = holder.getAdapterPosition();
 
                 ReadableFile readableFile = readableFileDetails.get(position);
-                Log.d("MyLogs", "FILE DETAILS BEFORE OPENING: " + readableFile.toString());
                 listener.fileOpened(readableFile);
 
-                Log.d("MyLogs", "BOOK TITLE: " + readableFileDetails.get(position).getFileName());
                 String uriString = readableFileDetails.get(position).getContentUri();
-                Uri fileUri = Uri.parse(uriString);
 
                 Intent intent = new Intent(context, EpubViewerActivity.class);
                 intent.putExtra("URI_STRING", uriString);
-                intent.putExtra("TEST", "This my testen strinen");
                 context.startActivity(intent);
 
             }
@@ -140,20 +134,13 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
     @Override
     public int getItemCount() {
         if (readableFileDetails == null) {
-            Log.d("MyLogs", "For some reason readableFileDetails ArrayList is null");
             return 0;
-        } else {
-            Log.d("MyLogs", "readableFileDetails ArrayList is not null");
+        } else {;
             return readableFileDetails.size();
         }
     }
 
     public void setReadableFileDetails(ArrayList<ReadableFile> readableFileDetails) {
-        if (readableFileDetails != null) {
-            Log.d("MyLogs", "SETTING NEW READABLE DETAILS: " + readableFileDetails.size());
-        } else {
-            Log.d("MyLogs", "NULL DETAILS SET!");
-        }
         this.readableFileDetails = readableFileDetails;
         notifyDataSetChanged();
     }

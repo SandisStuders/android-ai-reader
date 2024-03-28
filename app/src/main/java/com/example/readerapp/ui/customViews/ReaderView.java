@@ -17,7 +17,7 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.readerapp.data.services.ChatGptApi;
+import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.ui.activities.ResponseViewerActivity;
 
 import java.util.concurrent.ExecutorService;
@@ -106,14 +106,14 @@ public class ReaderView extends WebView {
 
     private void actionExplain(String value) {
         String processedValue = value.replaceAll("^\"|\"$", "");
-        ChatGptApi chatGptApi = new ChatGptApi();
+        ChatGptApiService chatGptApiService = new ChatGptApiService();
         String prompt = "Please provide a concise explanation of the below excerpt from a book: " + processedValue;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
         executor.execute(() -> {
             Log.d("MyLogs", prompt);
-            String response = chatGptApi.processPrompt(prompt);
+            String response = chatGptApiService.processPrompt(prompt);
 
             handler.post(() -> {
                 Context context = getContext();
