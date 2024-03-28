@@ -67,18 +67,10 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         holder.fileCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = v.getContext();
                 int position = holder.getAdapterPosition();
-
                 ReadableFile readableFile = readableFileDetails.get(position);
-                listener.fileOpened(readableFile);
 
-                String uriString = readableFileDetails.get(position).getContentUri();
-
-                Intent intent = new Intent(context, EpubViewerActivity.class);
-                intent.putExtra("URI_STRING", uriString);
-                context.startActivity(intent);
-
+                listener.fileOpened(readableFile, v);
             }
         });
 
@@ -103,8 +95,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
                         int itemId = item.getItemId();
 
                         if (itemId == R.id.action_open) {
-                            Toast toast = Toast.makeText(v.getContext() , "Open", Toast.LENGTH_SHORT);
-                            toast.show();
+                            listener.fileOpened(readableFileDetails.get(position), v);
                         } else if (itemId == R.id.action_add_to_favorites) {
                             listener.addToFavorites(readableFileDetails.get(position));
                         } else if (itemId == R.id.action_remove_from_recent) {
@@ -137,11 +128,6 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         }
     }
 
-    public void setReadableFileDetails(ArrayList<ReadableFile> readableFileDetails) {
-        this.readableFileDetails = readableFileDetails;
-        notifyDataSetChanged();
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView textFileName, textFileType, textFileCreationDate, textFileSize,
@@ -163,6 +149,11 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         }
     }
 
+    public void setReadableFileDetails(ArrayList<ReadableFile> readableFileDetails) {
+        this.readableFileDetails = readableFileDetails;
+        notifyDataSetChanged();
+    }
+
     public String getCurrentListType() {
         return currentListType;
     }
@@ -175,6 +166,6 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         void addToFavorites(ReadableFile readableFile);
         void removeFromRecent(ReadableFile readableFile);
         void removeFromFavorites(ReadableFile readableFile);
-        void fileOpened(ReadableFile readableFile);
+        void fileOpened(ReadableFile readableFile, View v);
     }
 }

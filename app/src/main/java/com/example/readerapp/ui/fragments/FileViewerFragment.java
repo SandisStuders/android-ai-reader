@@ -1,6 +1,8 @@
 package com.example.readerapp.ui.fragments;
 
 import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import com.example.readerapp.R;
 import com.example.readerapp.data.models.ReadableFile;
 import com.example.readerapp.data.models.ReadableFileViewModel;
 import com.example.readerapp.databinding.FragmentFileViewerBinding;
+import com.example.readerapp.ui.activities.EpubViewerActivity;
 import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;
 import com.example.readerapp.utils.HelperFunctions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -212,9 +215,16 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
     }
 
     @Override
-    public void fileOpened(ReadableFile readableFile) {
+    public void fileOpened(ReadableFile readableFile, View v) {
         long currentTimeMillis = System.currentTimeMillis();
         readableFile.setMostRecentAccessTime(currentTimeMillis);
         mReadableFileViewModel.update(readableFile);
+
+        Context context = v.getContext();
+        String uriString = readableFile.getContentUri();
+
+        Intent intent = new Intent(context, EpubViewerActivity.class);
+        intent.putExtra("URI_STRING", uriString);
+        context.startActivity(intent);
     }
 }
