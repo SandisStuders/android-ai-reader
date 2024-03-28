@@ -4,12 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
 @Entity(tableName = "readableFiles", primaryKeys = {"fileName", "relativePath"})
 public class ReadableFile {
-
-    private int id;
 
     @NonNull
     @ColumnInfo(name = "fileName")
@@ -37,7 +34,14 @@ public class ReadableFile {
     @ColumnInfo(name = "isFavorite")
     private boolean isFavorite;
 
-    public ReadableFile(String fileName, String contentUri, String creationDate, String fileSize, String fileType, String relativePath, long mostRecentAccessTime, boolean isFavorite) {
+    public ReadableFile(@NonNull String fileName,
+                        String contentUri,
+                        String creationDate,
+                        String fileSize,
+                        String fileType,
+                        @NonNull String relativePath,
+                        long mostRecentAccessTime,
+                        boolean isFavorite) {
         this.fileName = fileName;
         this.contentUri = contentUri;
         this.creationDate = creationDate;
@@ -49,12 +53,12 @@ public class ReadableFile {
     }
 
     @Ignore
-    public ReadableFile(String fileName,
+    public ReadableFile(@NonNull String fileName,
                         String contentUri,
                         String creationDate,
                         String fileSize,
                         String fileType,
-                        String relativePath) {
+                        @NonNull String relativePath) {
         this.fileName = fileName;
         this.contentUri = contentUri;
         this.creationDate = creationDate;
@@ -63,19 +67,12 @@ public class ReadableFile {
         this.relativePath = relativePath;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    @NonNull
     public String getFileName() {
         return fileName;
     }
 
-    public void setFileName(String fileName) {
+    public void setFileName(@NonNull String fileName) {
         this.fileName = fileName;
     }
 
@@ -111,11 +108,12 @@ public class ReadableFile {
         this.fileType = fileType;
     }
 
+    @NonNull
     public String getRelativePath() {
         return relativePath;
     }
 
-    public void setRelativePath(String relativePath) {
+    public void setRelativePath(@NonNull String relativePath) {
         this.relativePath = relativePath;
     }
 
@@ -135,6 +133,7 @@ public class ReadableFile {
         isFavorite = favorite;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ReadableFile{" +
