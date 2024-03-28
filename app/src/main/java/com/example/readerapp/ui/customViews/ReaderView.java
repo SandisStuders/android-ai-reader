@@ -47,7 +47,6 @@ public class ReaderView extends WebView {
 
     @Override
     public ActionMode startActionMode(ActionMode.Callback callback) {
-        Log.d("MyLogs", "Action mode started!");
         ActionMode.Callback customCallback = forwardingCallback(callback);
 
         return super.startActionMode(customCallback);
@@ -55,7 +54,6 @@ public class ReaderView extends WebView {
 
     @Override
     public ActionMode startActionMode(ActionMode.Callback callback, int type) {
-        Log.d("MyLogs", "Action mode started!");
         ActionMode.Callback customCallback = forwardingCallback(callback);
 
         return super.startActionMode(customCallback, type);

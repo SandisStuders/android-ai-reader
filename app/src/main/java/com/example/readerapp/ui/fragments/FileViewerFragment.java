@@ -40,11 +40,12 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     private RecyclerView filesRecyclerView;
     private BottomNavigationView bottomFileListSelectionBar;
+
+    private ReadableFileViewModel mReadableFileViewModel;
     private ArrayList<ReadableFile> favoriteFileDetails = new ArrayList<>();
     private ArrayList<ReadableFile> allFileDetails = new ArrayList<>();
     private ArrayList<ReadableFile> recentFileDetails = new ArrayList<>();
 
-    private ReadableFileViewModel mReadableFileViewModel;
     private String currentListType;
 
     @Override
@@ -57,13 +58,12 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
 
         ArrayList<ReadableFile> fileDetails = getPdfFileList();
-
         mReadableFileViewModel.insert(fileDetails);
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
         currentListType = "RECENT";
-        adapter.setReadableFileDetails(recentFileDetails);
         adapter.setCurrentListType(currentListType);
+        adapter.setReadableFileDetails(recentFileDetails);
 
         filesRecyclerView.setAdapter(adapter);
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -111,6 +111,9 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             public void onChanged(List<ReadableFile> readableFiles) {
                 if (readableFiles != null) {
                     allFileDetails = (ArrayList<ReadableFile>) readableFiles;
+                    if (Objects.equals(currentListType, "ALL")) {
+                        adapter.setReadableFileDetails(recentFileDetails);
+                    }
                 }
             }
         });
@@ -150,7 +153,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
         // Filter for PDF MIME type
         String selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-//        String[] selectionArgs = new String[]{"application/pdf"};
+        //String[] selectionArgs = new String[]{"application/pdf"};
         String[] selectionArgs = new String[]{"application/epub+zip"};
 
         // Query URI for external files content
@@ -181,7 +184,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                             contentUri.toString(),
                             creationDate,
                             adjustedFileSize,
-//                            "PDF",
+                            //"PDF",
                             "EPUB",
                             relativePath,
                             0,

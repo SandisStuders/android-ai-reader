@@ -10,13 +10,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import com.example.readerapp.R;
-import com.example.readerapp.ui.customViews.ReaderView;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
-import com.google.android.material.bottomappbar.BottomAppBar;
+import com.example.readerapp.ui.customViews.ReaderView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
