@@ -6,15 +6,18 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.example.readerapp.data.models.gptResponse.GptResponse;
+import com.example.readerapp.data.models.gptResponse.GptResponseDao;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.data.models.readableFile.ReadableFileDao;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {ReadableFile.class}, version = 8)
+@Database(entities = {ReadableFile.class, GptResponse.class}, version = 11)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ReadableFileDao readableFileDao();
+    public abstract GptResponseDao gptResponseDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
