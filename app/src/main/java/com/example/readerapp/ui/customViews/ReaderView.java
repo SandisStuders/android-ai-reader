@@ -28,6 +28,7 @@ public class ReaderView extends WebView {
 
     MenuItem explainItem;
     MenuItem copyItem;
+    private ActionModeCallback actionModeCallback;
 
     public ReaderView(@NonNull Context context) {
         super(context);
@@ -85,7 +86,9 @@ public class ReaderView extends WebView {
                     @Override
                     public void onReceiveValue(String value) {
                         if (item == explainItem) {
-                            actionExplain(value);
+                            if (actionModeCallback != null) {
+                                actionModeCallback.onTextSelected(value);
+                            }
                         } else if (item == copyItem) {
                             actionCopy(value);
                         }
@@ -102,28 +105,6 @@ public class ReaderView extends WebView {
         };
     }
 
-    private void actionExplain(String value) {
-        String processedValue = value.replaceAll("^\"|\"$", "");
-        ChatGptApiService chatGptApiService = new ChatGptApiService();
-        String prompt = "Please provide a concise explanation of the below excerpt from a book: " + processedValue;
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        executor.execute(() -> {
-            Log.d("MyLogs", prompt);
-            String response = chatGptApiService.processPrompt(prompt);
-
-            handler.post(() -> {
-                Context context = getContext();
-                Intent intent = new Intent(context, ResponseViewerActivity.class);
-                intent.putExtra("SELECTION", processedValue);
-                intent.putExtra("RESPONSE", response);
-                context.startActivity(intent);
-            });
-        });
-
-    }
-
     private void actionCopy(String value) {
         String processedValue = value.replaceAll("^\"|\"$", "");
         //TODO: JavaScript copies string as JSON string therefore escape characters possible. These should be escaped
@@ -131,6 +112,14 @@ public class ReaderView extends WebView {
         ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("default", processedValue);
         clipboardManager.setPrimaryClip(clip);
+    }
+
+    public void setActionModeCallback(ActionModeCallback callback) {
+        this.actionModeCallback = callback;
+    }
+
+    public interface ActionModeCallback {
+        void onTextSelected(String selectedText);
     }
 
 }
