@@ -225,9 +225,13 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
         Context context = v.getContext();
         String uriString = readableFile.getContentUri();
+        String fileName = readableFile.getFileName();
+        String fileRelativePath = readableFile.getRelativePath();
 
         Intent intent = new Intent(context, EpubViewerActivity.class);
         intent.putExtra("URI_STRING", uriString);
+        intent.putExtra("FILE_NAME", fileName);
+        intent.putExtra("FILE_RELATIVE_PATH", fileRelativePath);
         context.startActivity(intent);
     }
 }

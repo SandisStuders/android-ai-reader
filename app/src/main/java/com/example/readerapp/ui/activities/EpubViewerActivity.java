@@ -14,8 +14,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.readerapp.R;
+import com.example.readerapp.data.models.gptResponse.GptResponse;
+import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
+import com.example.readerapp.data.models.readableFile.ReadableFileViewModel;
 import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.example.readerapp.ui.customViews.ReaderView;
@@ -41,11 +45,16 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     BottomNavigationView bottomAppBar;
     int currentChapter;
     ArrayList<String> bookData;
+    String fileName;
+    String fileRelativePath;
+    private GptResponseViewModel mGptResponseViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_viewer);
+
+        mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
         epubViewer = binding.epubViewer;
@@ -60,6 +69,8 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
         Intent intent = getIntent();
         String uriString = intent.getStringExtra("URI_STRING");
+        fileName = intent.getStringExtra("FILE_NAME");
+        fileRelativePath = intent.getStringExtra("FILE_RELATIVE_PATH");
         Uri uri = Uri.parse(uriString);
 
         ContentResolver contentResolver = getContentResolver();
@@ -143,6 +154,14 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
             handler.post(() -> {
                 Log.d("MyLogs", "Response: " + response);
+
+                GptResponse gptResponse = new GptResponse(fileName,
+                        fileRelativePath,
+                        selectedText,
+                        response,
+                        currentChapter);
+                mGptResponseViewModel.insert(gptResponse);
+
                 Context context = this;
                 Intent intent = new Intent(context, ResponseViewerActivity.class);
                 intent.putExtra("SELECTION", processedValue);
