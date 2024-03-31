@@ -1,9 +1,12 @@
-package com.example.readerapp.data.models;
+package com.example.readerapp.data.models.readableFile;
 
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+
+import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
 
 import java.util.ArrayList;
 import java.util.List;

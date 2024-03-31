@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.ReadableFile;
-import com.example.readerapp.data.models.ReadableFileViewModel;
+import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.readableFile.ReadableFileViewModel;
 import com.example.readerapp.databinding.FragmentFileViewerBinding;
 import com.example.readerapp.ui.activities.EpubViewerActivity;
 import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;

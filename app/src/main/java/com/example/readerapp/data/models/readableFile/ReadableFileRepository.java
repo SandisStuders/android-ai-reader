@@ -1,8 +1,12 @@
-package com.example.readerapp.data.models;
+package com.example.readerapp.data.models.readableFile;
 
 import android.app.Application;
 
 import androidx.lifecycle.LiveData;
+
+import com.example.readerapp.data.models.AppDatabase;
+import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.readableFile.ReadableFileDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +26,7 @@ public class ReadableFileRepository {
         mRecentFiles = mReadableFileDao.getRecentFiles();
     }
 
-    LiveData<List<ReadableFile>> getAllReadableFiles() {
+    public LiveData<List<ReadableFile>> getAllReadableFiles() {
         return mAllReadableFiles;
     }
 
@@ -30,13 +34,13 @@ public class ReadableFileRepository {
 
     public LiveData<List<ReadableFile>> getRecentFiles() {return mRecentFiles;}
 
-    void insert(ReadableFile readableFile) {
+    public void insert(ReadableFile readableFile) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mReadableFileDao.insertFiles(readableFile);
         });
     }
 
-    void insert(ArrayList<ReadableFile> readableFiles) {
+    public void insert(ArrayList<ReadableFile> readableFiles) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mReadableFileDao.insertFiles(readableFiles);
         });

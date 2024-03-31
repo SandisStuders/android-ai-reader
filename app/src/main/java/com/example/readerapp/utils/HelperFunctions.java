@@ -18,14 +18,12 @@ public class HelperFunctions {
     }
 
     public static String adjustByteSizeString(String bytesString) {
-        Log.d("MyLogs", "BYTES: " + bytesString);
         double bytes = Double.parseDouble(bytesString);
         if (bytes < 1024) {
             return  roundToOneDecimal(bytes) + " B";
         }
 
         double kilobytes = bytes / 1024;
-        Log.d("MyLogs", "KILOBYTES: " + kilobytes);
         if (kilobytes < 1024) {
             return roundToOneDecimal(kilobytes) + " KB";
         }
@@ -33,10 +31,8 @@ public class HelperFunctions {
         double megabytes = kilobytes / 1024;
         Log.d("MyLogs", "MEGABYTES: " + megabytes);
         if (megabytes < 1024) {
-            Log.d("MyLogs", "GOING TO MEGABYTES");
             return roundToOneDecimal(megabytes) + " MB";
         } else {
-            Log.d("MyLogs", "GOING TO GIGABYTES");
             return roundToOneDecimal(megabytes/1024) + " GB";
         }
     }

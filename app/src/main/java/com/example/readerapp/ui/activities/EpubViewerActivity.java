@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -31,21 +30,23 @@ import nl.siegmann.epublib.epub.EpubReader;
 public class EpubViewerActivity extends AppCompatActivity {
 
     ActivityEpubViewerBinding binding;
+    ReaderView epubViewer;
+    BottomNavigationView bottomAppBar;
     int currentChapter;
     ArrayList<String> bookData;
-    ReaderView epubViewer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("MyLogs", "Reader started!");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_viewer);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
-        currentChapter = 8;
+        epubViewer = binding.epubViewer;
+        bottomAppBar = binding.bottomAppBar;
+
+        currentChapter = 0;
         bookData = new ArrayList<>();
 
-        epubViewer = binding.epubViewer;
         epubViewer.getSettings().setJavaScriptEnabled(true);
 
         Intent intent = getIntent();
@@ -58,7 +59,6 @@ public class EpubViewerActivity extends AppCompatActivity {
             Book book = (new EpubReader()).readEpub(fileStream);
 
             Spine spine = book.getSpine();
-            Log.d("MyLogs", "SPINE SIZE: " + spine.size());
 
             for(int i = 0; i < spine.size(); i++){
                 StringBuilder builder = new StringBuilder();
@@ -81,15 +81,12 @@ public class EpubViewerActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
 
-        BottomNavigationView bottomAppBar = binding.bottomAppBar;
         bottomAppBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.prevChapter) {
-                    Toast toast = Toast.makeText(binding.getRoot().getContext() , "Previous chapter", Toast.LENGTH_SHORT);
-                    toast.show();
                     if (currentChapter > 0) {
                         currentChapter--;
                         loadCurrentChapter();
@@ -100,8 +97,6 @@ public class EpubViewerActivity extends AppCompatActivity {
                     toast.show();
                     return true;
                 } else if (itemId == R.id.nextChapter) {
-                    Toast toast = Toast.makeText(binding.getRoot().getContext() , "Next chapter", Toast.LENGTH_SHORT);
-                    toast.show();
                     if (currentChapter < bookData.size() - 1) {
                         currentChapter++;
                         loadCurrentChapter();
@@ -117,7 +112,6 @@ public class EpubViewerActivity extends AppCompatActivity {
 
     private void loadCurrentChapter() {
         String dataPiece = bookData.get(currentChapter);
-        Log.d("MyLogs", dataPiece);
 
         epubViewer.loadDataWithBaseURL(null,
                 dataPiece,
@@ -125,5 +119,4 @@ public class EpubViewerActivity extends AppCompatActivity {
                 "UTF-8",
                 null);
     }
-
 }

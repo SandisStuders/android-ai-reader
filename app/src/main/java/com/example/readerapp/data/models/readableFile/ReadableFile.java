@@ -1,4 +1,4 @@
-package com.example.readerapp.data.models;
+package com.example.readerapp.data.models.readableFile;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

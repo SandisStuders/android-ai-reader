@@ -1,28 +1,20 @@
 package com.example.readerapp.ui.adapters;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresPermission;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.ReadableFile;
-import com.example.readerapp.ui.activities.EpubViewerActivity;
+import com.example.readerapp.data.models.readableFile.ReadableFile;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
