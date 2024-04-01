@@ -17,4 +17,7 @@
     <string name="recent_files_button_text">Recent</string>
     <string name="favorite_files_button_text">Favorites</string>
     <string name="all_files_button_text">All files</string>
+    <string name="placeholder_response_file_name">Name</string>
+    <string name="placeholder_response_selected_text">Selected text</string>
+    <string name="placeholder_gpt_response">GPT Response</string>
 </resources>

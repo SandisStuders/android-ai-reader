@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import com.example.readerapp.ui.activities.ReaderActivity;
 import com.example.readerapp.databinding.FragmentMainBodyBinding;
 import com.example.readerapp.ui.activities.FileViewerActivity;
+import com.example.readerapp.ui.activities.ResponseHistoryViewerActivity;
 
 import java.util.ArrayList;
 
@@ -92,8 +93,8 @@ public class MainBodyFragment extends Fragment {
         pdfFileCheckButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("MyLogs", "PDF BUTTON PRESSED");
-                getPdfFileList();
+                Intent intent = new Intent(getContext(), ResponseHistoryViewerActivity.class);
+                startActivity(intent);
             }
         });
 
