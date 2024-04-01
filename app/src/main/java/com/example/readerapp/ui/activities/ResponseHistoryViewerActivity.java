@@ -1,5 +1,7 @@
 package com.example.readerapp.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ResponseHistoryViewerActivity extends AppCompatActivity {
+public class ResponseHistoryViewerActivity extends AppCompatActivity implements ResponsesRecyclerViewAdapter.ResponseOptionListener {
 
     ActivityResponseHistoryViewerBinding binding;
     private RecyclerView responsesRecyclerView;
@@ -41,7 +43,7 @@ public class ResponseHistoryViewerActivity extends AppCompatActivity {
 
         mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
 
-        ResponsesRecyclerViewAdapter adapter = new ResponsesRecyclerViewAdapter();
+        ResponsesRecyclerViewAdapter adapter = new ResponsesRecyclerViewAdapter(this);
         adapter.setGptResponses(gptResponses);
 
         responsesRecyclerView.setAdapter(adapter);
@@ -59,4 +61,17 @@ public class ResponseHistoryViewerActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void openResponse(GptResponse gptResponse) {
+        Context context = this;
+        Intent intent = new Intent(context, ResponseViewerActivity.class);
+        intent.putExtra("SELECTION", gptResponse.getSelectedText());
+        intent.putExtra("RESPONSE", gptResponse.getResponse());
+        context.startActivity(intent);
+    }
+
+    @Override
+    public void deleteResponse(GptResponse gptResponse) {
+        mGptResponseViewModel.delete(gptResponse);
+    }
 }
