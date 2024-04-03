@@ -20,4 +20,7 @@
     <string name="placeholder_response_file_name">Name</string>
     <string name="placeholder_response_selected_text">Selected text</string>
     <string name="placeholder_gpt_response">GPT Response</string>
+
+    <string name="toolbar_history_text">History</string>
+    <string name="toolbar_settings_text">Settings</string>
 </resources>
