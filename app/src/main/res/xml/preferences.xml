@@ -1,0 +1,49 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:key="theme"
+        android:title="Theme"
+        android:dialogTitle="Set the visual theme of the application"
+        android:entries="@array/pref_theme_titles"
+        android:entryValues="@array/pref_theme_values"
+        android:defaultValue="0"/>
+
+    <PreferenceCategory android:title="Personal prompt">
+
+        <SwitchPreferenceCompat
+            android:key="personal_prompt_enable"
+            android:title="Enable Personal Prompt"
+            android:summary="Adds your personal prompt that gets sent to ChatGPT together with the selected text"
+            android:defaultValue="false" />
+
+        <EditTextPreference
+            android:dependency="personal_prompt_enable"
+            android:dialogTitle="Insert the name of your personal prompt"
+            android:key="personal_prompt_name"
+            android:summary="Insert the name of your personal prompt that will show up when text is selected (Besides &quot;Explain&quot; and &quot;Copy\&quot;"
+            android:title="Personal Prompt Name"
+            app:defaultValue="Personal"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:dependency="personal_prompt_enable"
+            android:dialogTitle="Define your personal prompt"
+            android:key="personal_prompt_define"
+            android:title="Define Personal Prompt"
+            app:summary="Define your personal prompt that will be sent to ChatGPT together with your selected text" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Advanced settings">
+
+        <SeekBarPreference
+            android:defaultValue="40"
+            android:key="temperature"
+            android:max="100"
+            android:title="Temperature percentage"
+            app:showSeekBarValue="true"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

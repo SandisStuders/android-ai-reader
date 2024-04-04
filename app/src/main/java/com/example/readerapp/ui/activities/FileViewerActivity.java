@@ -50,8 +50,9 @@ public class FileViewerActivity extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 } else if (itemId == R.id.action_settings) {
-                    Log.d("MyLogs", "SETTINGS");
-                    return false;
+                    Intent intent = new Intent(context, SettingsActivity.class);
+                    startActivity(intent);
+                    return true;
                 }
 
                 return false;
