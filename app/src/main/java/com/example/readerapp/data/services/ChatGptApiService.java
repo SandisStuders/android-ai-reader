@@ -18,7 +18,7 @@ public class ChatGptApiService {
         model = "gpt-3.5-turbo";
     }
 
-    public String processPrompt(String prompt) {
+    public String processPrompt(String systemPrompt, String prompt, Double temperature) {
         try {
             URI uri = new URI(apiEndpoint);
             URL urlObj = uri.toURL();
@@ -29,7 +29,13 @@ public class ChatGptApiService {
             connection.setRequestProperty("Content-Type", "application/json");
 
             // The request body
-            String body = "{\"model\": \"" + model + "\", \"messages\": [{\"role\": \"user\", \"content\": \"" + prompt + "\"}]}";
+            String body = String.format(
+                    "{\"model\": \"%s\", " +
+                            "\"messages\": [{\"role\": \"system\", \"content\": \"%s\"}, {\"role\": \"user\", \"content\": \"%s\"}], " +
+                            "\"temperature\": %s}",
+                    model, systemPrompt, prompt, temperature
+            );
+
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(body);

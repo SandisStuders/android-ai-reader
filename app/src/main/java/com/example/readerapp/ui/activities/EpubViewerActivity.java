@@ -3,6 +3,7 @@ package com.example.readerapp.ui.activities;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
 import com.example.readerapp.data.models.gptResponse.GptResponse;
@@ -142,15 +144,20 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
     @Override
     public void onTextSelected(String selectedText) {
-        String processedValue = selectedText.replaceAll("^\"|\"$", "");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // 'context' refers to the Activity or Context object
+        int temperaturePercentage = sharedPreferences.getInt("temperature", 40);
+
+        String systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt because they want a bigger explanation on their selection. Interpret the text and try to provide factual knowledge surrounding it, avoid speculations and uncertainties if possible. Try to keep your response encompassing but concise, 100-200 tokens, if possible.";
+        String prompt = selectedText.replaceAll("^\"|\"$", "");
+        double temperature = ((double) temperaturePercentage) / 100;
+
         ChatGptApiService chatGptApiService = new ChatGptApiService();
-        String prompt = "Please provide a concise explanation of the below excerpt from a book: " + processedValue;
+
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-
         executor.execute(() -> {
             Log.d("MyLogs", prompt);
-            String response = chatGptApiService.processPrompt(prompt);
+            String response = chatGptApiService.processPrompt(systemPrompt, prompt, temperature);
 
             handler.post(() -> {
                 Log.d("MyLogs", "Response: " + response);
@@ -164,7 +171,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
                 Context context = this;
                 Intent intent = new Intent(context, ResponseViewerActivity.class);
-                intent.putExtra("SELECTION", processedValue);
+                intent.putExtra("SELECTION", prompt);
                 intent.putExtra("RESPONSE", response);
                 context.startActivity(intent);
             });
