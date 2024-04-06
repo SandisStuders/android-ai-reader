@@ -1,13 +1,28 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ListPreference
-        android:key="theme"
-        android:title="Theme"
-        android:dialogTitle="Set the visual theme of the application"
-        android:entries="@array/pref_theme_titles"
-        android:entryValues="@array/pref_theme_values"
-        android:defaultValue="0"/>
+
+    <PreferenceCategory android:title="General">
+
+        <ListPreference
+            android:key="theme"
+            android:title="Theme"
+            android:dialogTitle="Set the visual theme of the application"
+            android:entries="@array/pref_theme_titles"
+            android:entryValues="@array/pref_theme_values"
+            android:defaultValue="0"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Privacy">
+
+        <SwitchPreferenceCompat
+            android:key="send_file_name"
+            android:title="Send Document Name"
+            android:summary="The name of your document will be sent to ChatGPT to provide additional context"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
 
     <PreferenceCategory android:title="Personal prompt">
 

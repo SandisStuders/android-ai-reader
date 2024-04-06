@@ -1,5 +1,7 @@
 package com.example.readerapp.data.services;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,6 +54,8 @@ public class ChatGptApiService {
                 response.append(line);
             }
             br.close();
+
+            Log.d("MyLogs", "Raw response: " + response);
 
             return extractMessageFromJSONResponse(response.toString());
 

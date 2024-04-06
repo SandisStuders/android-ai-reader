@@ -152,7 +152,13 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         } else {
             systemPrompt = sharedPreferences.getString("personal_prompt_define", "defaultDefinition");
         }
+
         String prompt = selectedText.replaceAll("^\"|\"$", "");
+        boolean includeFileName = sharedPreferences.getBoolean("send_file_name", false);
+        if (includeFileName) {
+            prompt = "File name: " + fileName + "; Selected text: " + prompt;
+        }
+
         double temperature = ((double) temperaturePercentage) / 100;
 
         ChatGptApiService chatGptApiService = new ChatGptApiService();
@@ -160,9 +166,10 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         String finalSystemPrompt = systemPrompt;
+        String finalPrompt = prompt;
         executor.execute(() -> {
-            Log.d("MyLogs", prompt);
-            String response = chatGptApiService.processPrompt(finalSystemPrompt, prompt, temperature);
+            Log.d("MyLogs", finalPrompt);
+            String response = chatGptApiService.processPrompt(finalSystemPrompt, finalPrompt, temperature);
 
             handler.post(() -> {
                 Log.d("MyLogs", "Response: " + response);
@@ -176,7 +183,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
                 Context context = this;
                 Intent intent = new Intent(context, ResponseViewerActivity.class);
-                intent.putExtra("SELECTION", prompt);
+                intent.putExtra("SELECTION", finalPrompt);
                 intent.putExtra("RESPONSE", response);
                 context.startActivity(intent);
             });
