@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class ChatGptApiService {
 
@@ -66,12 +69,20 @@ public class ChatGptApiService {
     }
 
     public static String extractMessageFromJSONResponse(String response) {
-        int start = response.indexOf("content")+ 11;
+        try {
+            JSONObject obj = new JSONObject(response);
+            String content = obj.getJSONArray("choices")
+                    .getJSONObject(0)
+                    .getJSONObject("message")
+                    .getString("content");
 
-        int end = response.indexOf("\"", start);
+            Log.d("MyLogs", content);
+            return content;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        return response.substring(start, end);
-
+        return null;
     }
 
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Reader App</string>
+    <string name="app_name">AI Reader</string>
     <string name="pick_a_file">Pick a file</string>
     <string name="file_picker_text_placeholder">No file picked!</string>
     <string name="check_files">Check files</string>
