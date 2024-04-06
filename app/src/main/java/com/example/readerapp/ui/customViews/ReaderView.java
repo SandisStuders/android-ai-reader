@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
@@ -16,6 +17,7 @@ import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.ui.activities.ResponseViewerActivity;
@@ -28,6 +30,7 @@ public class ReaderView extends WebView {
 
     MenuItem explainItem;
     MenuItem copyItem;
+    MenuItem personalPromptItem;
     private ActionModeCallback actionModeCallback;
 
     public ReaderView(@NonNull Context context) {
@@ -75,6 +78,14 @@ public class ReaderView extends WebView {
 
                 menu.clear();
                 explainItem = menu.add("Explain");
+
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                boolean personalPromptEnabled = sharedPreferences.getBoolean("personal_prompt_enable", false);
+                if (personalPromptEnabled) {
+                    String personalPromptName = sharedPreferences.getString("personal_prompt_name", "defaultName");
+                    personalPromptItem = menu.add(personalPromptName);
+                }
+
                 copyItem = menu.add("Copy");
 
                 return result;
@@ -87,10 +98,14 @@ public class ReaderView extends WebView {
                     public void onReceiveValue(String value) {
                         if (item == explainItem) {
                             if (actionModeCallback != null) {
-                                actionModeCallback.onTextSelected(value);
+                                actionModeCallback.onTextSelected(value, true);
                             }
                         } else if (item == copyItem) {
                             actionCopy(value);
+                        } else if (item == personalPromptItem) {
+                            if (actionModeCallback != null) {
+                                actionModeCallback.onTextSelected(value, false);
+                            }
                         }
                     }
                 });
@@ -119,7 +134,7 @@ public class ReaderView extends WebView {
     }
 
     public interface ActionModeCallback {
-        void onTextSelected(String selectedText);
+        void onTextSelected(String selectedText, boolean useDefaultSystemPrompt);
     }
 
 }

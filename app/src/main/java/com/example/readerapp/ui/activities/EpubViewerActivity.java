@@ -21,7 +21,6 @@ import androidx.preference.PreferenceManager;
 import com.example.readerapp.R;
 import com.example.readerapp.data.models.gptResponse.GptResponse;
 import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
-import com.example.readerapp.data.models.readableFile.ReadableFileViewModel;
 import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.example.readerapp.ui.customViews.ReaderView;
@@ -143,11 +142,16 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     }
 
     @Override
-    public void onTextSelected(String selectedText) {
+    public void onTextSelected(String selectedText, boolean useDefaultSystemPrompt) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // 'context' refers to the Activity or Context object
         int temperaturePercentage = sharedPreferences.getInt("temperature", 40);
 
-        String systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt because they want a bigger explanation on their selection. Interpret the text and try to provide factual knowledge surrounding it, avoid speculations and uncertainties if possible. Try to keep your response encompassing but concise, 100-200 tokens, if possible.";
+        String systemPrompt = "";
+        if (useDefaultSystemPrompt) {
+            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt because they want a bigger explanation on their selection. Interpret the text and try to provide factual knowledge surrounding it, avoid speculations and uncertainties if possible. Try to keep your response encompassing but concise, 100-200 tokens, if possible.";
+        } else {
+            systemPrompt = sharedPreferences.getString("personal_prompt_define", "defaultDefinition");
+        }
         String prompt = selectedText.replaceAll("^\"|\"$", "");
         double temperature = ((double) temperaturePercentage) / 100;
 
@@ -155,9 +159,10 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
+        String finalSystemPrompt = systemPrompt;
         executor.execute(() -> {
             Log.d("MyLogs", prompt);
-            String response = chatGptApiService.processPrompt(systemPrompt, prompt, temperature);
+            String response = chatGptApiService.processPrompt(finalSystemPrompt, prompt, temperature);
 
             handler.post(() -> {
                 Log.d("MyLogs", "Response: " + response);
