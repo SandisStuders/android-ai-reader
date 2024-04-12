@@ -1,5 +1,6 @@
 package com.example.readerapp.ui.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,9 +8,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -24,6 +30,13 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     Toolbar appToolbar;
     Context context;
+    ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    loadFileViewerFragment();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent();
                         intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                        startActivity(intent);
+
+                        mStartForResult.launch(intent);
                     }
                 });
 
@@ -53,9 +67,7 @@ public class MainActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         if (savedInstanceState == null) { // Check to prevent adding the fragment again on rotate
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.file_viewer_fragment, new FileViewerFragment())
-                    .commit();
+            loadFileViewerFragment();
         }
 
         appToolbar = binding.appToolbar;
@@ -88,4 +100,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private void restartActivity() {
+        finish();  // Finish the current instance of the activity
+    }
+
+    private void loadFileViewerFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.file_viewer_fragment, new FileViewerFragment())
+                .commit();
+    }
 }

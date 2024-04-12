@@ -1,5 +1,6 @@
 package com.example.readerapp.ui.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -142,6 +143,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
     }
 
     public void setReadableFileDetails(ArrayList<ReadableFile> readableFileDetails) {
+        Log.d("MyLogs", "ADAPTER: FILE DETAILS CHANGED! ITEM COUNT: " + readableFileDetails.size());
         this.readableFileDetails = readableFileDetails;
         notifyDataSetChanged();
     }
@@ -151,6 +153,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
     }
 
     public void setCurrentListType(String currentListType) {
+        Log.d("MyLogs", "ADAPTER: CURRENT LIST TYPE CHANGED!");
         this.currentListType = currentListType;
     }
 

@@ -29,7 +29,6 @@ public class HelperFunctions {
         }
 
         double megabytes = kilobytes / 1024;
-        Log.d("MyLogs", "MEGABYTES: " + megabytes);
         if (megabytes < 1024) {
             return roundToOneDecimal(megabytes) + " MB";
         } else {
