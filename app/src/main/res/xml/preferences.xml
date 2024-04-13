@@ -1,64 +1,54 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-    <PreferenceCategory android:title="General">
-
+    <PreferenceCategory android:title="@string/settings_category_general">
         <ListPreference
             android:key="theme"
-            android:title="Theme"
-            android:dialogTitle="Set the visual theme of the application"
+            android:title="@string/settings_preference_theme"
+            android:dialogTitle="@string/settings_dialogue_title_theme"
             android:entries="@array/pref_theme_titles"
             android:entryValues="@array/pref_theme_values"
             android:defaultValue="0"/>
-
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Privacy">
-
+    <PreferenceCategory android:title="@string/settings_category_privacy">
         <SwitchPreferenceCompat
             android:key="send_file_name"
-            android:title="Send Document Name"
-            android:summary="The name of your document will be sent to ChatGPT to provide additional context"
+            android:title="@string/settings_preference_send_document_name"
+            android:summary="@string/settings_description_send_document_name"
             android:defaultValue="false" />
-
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Personal prompt">
-
+    <PreferenceCategory android:title="@string/settings_category_personal_prompt">
         <SwitchPreferenceCompat
             android:key="personal_prompt_enable"
-            android:title="Enable Personal Prompt"
-            android:summary="Adds your personal prompt that gets sent to ChatGPT together with the selected text"
+            android:title="@string/settings_preference_personal_prompt_enable"
+            android:summary="@string/settings_description_personal_prompt_enable"
             android:defaultValue="false" />
 
         <EditTextPreference
-            android:dependency="personal_prompt_enable"
-            android:dialogTitle="Insert the name of your personal prompt"
             android:key="personal_prompt_name"
-            android:summary="Insert the name of your personal prompt that will show up when text is selected (Besides &quot;Explain&quot; and &quot;Copy\&quot;"
-            android:title="Personal Prompt Name"
-            app:defaultValue="Personal"
-            app:useSimpleSummaryProvider="true" />
+            android:title="@string/settings_preference_personal_prompt_name"
+            android:dialogTitle="@string/settings_dialogue_title_personal_prompt_name"
+            android:summary="@string/settings_description_personal_prompt_name"
+            android:dependency="personal_prompt_enable"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="@string/settings_default_personal_prompt_name" />
 
         <EditTextPreference
-            android:dependency="personal_prompt_enable"
-            android:dialogTitle="Define your personal prompt"
             android:key="personal_prompt_define"
-            android:title="Define Personal Prompt"
-            app:summary="Define your personal prompt that will be sent to ChatGPT together with your selected text" />
-
+            android:title="@string/settings_preference_personal_prompt_define"
+            android:dialogTitle="@string/settings_dialogue_title_personal_prompt_define"
+            app:summary="@string/settings_description_personal_prompt_define"
+            android:dependency="personal_prompt_enable" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Advanced settings">
-
+    <PreferenceCategory android:title="@string/settings_category_advanced">
         <SeekBarPreference
-            android:defaultValue="40"
             android:key="temperature"
+            android:title="@string/settings_preference_temperature"
             android:max="100"
-            android:title="Temperature percentage"
-            app:showSeekBarValue="true"/>
-
+            app:showSeekBarValue="true"
+            android:defaultValue="40"/>
     </PreferenceCategory>
-
 </PreferenceScreen>

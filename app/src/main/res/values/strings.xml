@@ -1,26 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AI Reader</string>
-    <string name="pick_a_file">Pick a file</string>
-    <string name="file_picker_text_placeholder">No file picked!</string>
-    <string name="check_files">Check files</string>
-    <string name="placeholder_file_name">File Name</string>
-    <string name="placeholder_creation_date">Creation date</string>
-    <string name="placeholder_file_type">File type</string>
-    <string name="placeholder_file_size">File size</string>
-    <string name="placeholder_file_relative_path">File relative path</string>
-    <string name="next_chapter_button_text">Next chapter</string>
-    <string name="previous_chapter_button_text">Previous chapter</string>
-    <string name="select_chapter_button_text">Select chapter</string>
-    <string name="text_bar_explain_button_text">Explain</string>
-    <string name="text_bar_copy_button_text">Copy</string>
 
-    <string name="recent_files_button_text">Recent</string>
-    <string name="favorite_files_button_text">Favorites</string>
-    <string name="all_files_button_text">All files</string>
-    <string name="placeholder_response_file_name">Name</string>
-    <string name="placeholder_response_selected_text">Selected text</string>
-    <string name="placeholder_gpt_response">GPT Response</string>
+    <!-- REUSABLE STRINGS -->
+    <string name="file_info_filename_default">Unknown file</string>
+    <string name="file_info_date_default">Unknown date</string>
+    <string name="file_info_file_type_default">Document</string>
+    <string name="file_info_file_size_default">0.00 KB</string>
+    <string name="file_info_relative_path_default">/</string>
 
-    <string name="toolbar_history_text">History</string>
-    <string name="toolbar_settings_text">Settings</string>
+    <string name="action_open">Open</string>
+    <string name="action_delete">Delete</string>
+
+    <string name="popup_menu_add_favorite">Add to favorites</string>
+    <string name="popup_menu_remove_favorite">Remove from favorites</string>
+    <string name="popup_menu_remove_recent">Remove from recent</string>
+
+    <!-- UI SPECIFIC SCREEN STRINGS -->
+    <!-- File List Viewer Screen -->
+    <string name="file_navbar_recent">Recent</string>
+    <string name="file_navbar_favorites">Favorites</string>
+    <string name="file_navbar_all">All files</string>
+
+    <string name="storage_access_alert_text">To access and display documents on your device the app needs access to your File System. After pressing "OK", please enable the access for AI Reader app in the appearing settings window. The access to your file system will be used only in the context of finding and displaying your document files to you.</string>
+    <string name="storage_access_alert_title">Android File System Access</string>
+    <string name="storage_access_alert_button_ok">OK</string>
+
+    <!-- Document Viewer Screen -->
+    <string name="document_button_next_chapter">Next chapter</string>
+    <string name="document_button_previous_chapter">Previous chapter</string>
+    <string name="document_button_select_chapter">Select chapter</string>
+    <string name="document_action_bar_explain">Explain</string>
+    <string name="document_action_bar_copy">Copy</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_category_general">General</string>
+    <string name="settings_category_privacy">Privacy</string>
+    <string name="settings_category_personal_prompt">Personal prompt</string>
+    <string name="settings_category_advanced">Advanced settings</string>
+
+    <string name="settings_preference_theme">Theme</string>
+    <string name="settings_preference_send_document_name">Send Document Name</string>
+    <string name="settings_preference_personal_prompt_enable">Enable Personal Prompt</string>
+    <string name="settings_preference_personal_prompt_name">Personal Prompt Name</string>
+    <string name="settings_preference_personal_prompt_define">Define Personal Prompt</string>
+    <string name="settings_preference_temperature">Temperature Percentage</string>
+
+    <string name="settings_dialogue_title_theme">Set the visual theme of the application</string>
+    <string name="settings_dialogue_title_personal_prompt_name">Insert the name of your personal prompt</string>
+    <string name="settings_dialogue_title_personal_prompt_define">Define your personal prompt</string>
+
+    <string name="settings_description_send_document_name">The name of your document will be sent to ChatGPT to provide additional context</string>
+    <string name="settings_description_personal_prompt_enable">Adds your personal prompt that gets sent to ChatGPT together with the selected text</string>
+    <string name="settings_description_personal_prompt_name">Insert the name of your personal prompt that will show up when text is selected</string>
+    <string name="settings_description_personal_prompt_define">Define your personal prompt that will be sent to ChatGPT together with your selected text</string>
+
+    <string name="settings_default_personal_prompt_name">Personal Prompt</string>
+
+    <!-- Response Viewer Screen -->
+    <string name="response_selected_text_default">No selected text</string>
+    <string name="response_ai_response_default">No response</string>
+
+    <!-- Toolbar -->
+    <string name="toolbar_history">History</string>
+    <string name="toolbar_settings">Settings</string>
+
 </resources>

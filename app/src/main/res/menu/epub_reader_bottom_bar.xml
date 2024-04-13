@@ -4,19 +4,19 @@
     <item
         android:id="@+id/prevChapter"
         android:icon="@drawable/ic_navigate_back"
-        android:title="@string/previous_chapter_button_text"
+        android:title="@string/document_button_previous_chapter"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/selectChapter"
         android:icon="@drawable/ic_select_chapter"
-        android:title="@string/select_chapter_button_text"
+        android:title="@string/document_button_select_chapter"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/nextChapter"
         android:icon="@drawable/ic_navigate_forward"
-        android:title="@string/next_chapter_button_text"
+        android:title="@string/document_button_next_chapter"
         app:showAsAction="ifRoom"/>
 
 </menu>

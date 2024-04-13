@@ -4,19 +4,19 @@
     <item
         android:id="@+id/recentFiles"
         android:icon="@drawable/ic_recent_files"
-        android:title="@string/recent_files_button_text"
+        android:title="@string/file_navbar_recent"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/favoriteFiles"
         android:icon="@drawable/ic_favorite_files"
-        android:title="@string/favorite_files_button_text"
+        android:title="@string/file_navbar_favorites"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/allFiles"
         android:icon="@drawable/ic_all_files"
-        android:title="@string/all_files_button_text"
+        android:title="@string/file_navbar_all"
         app:showAsAction="ifRoom"/>
 
 </menu>

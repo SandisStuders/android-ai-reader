@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/action_open"
-        android:title="Open"/>
+        android:title="@string/action_open"/>
     <item android:id="@+id/action_add_to_favorites"
-        android:title="Add to favorites"/>
+        android:title="@string/popup_menu_add_favorite"/>
     <item android:id="@+id/action_remove_from_recent"
-        android:title="Remove from recent"/>
+        android:title="@string/popup_menu_remove_recent"/>
 </menu>

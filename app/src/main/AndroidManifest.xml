@@ -25,10 +25,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.ReaderActivity"
-            android:exported="true">
-        </activity>
-        <activity
             android:name=".ui.activities.EpubViewerActivity"
             android:exported="true">
         </activity>

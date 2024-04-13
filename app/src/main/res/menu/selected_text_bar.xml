@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/explainAction"
-        android:title="@string/text_bar_explain_button_text"
+        android:title="@string/document_action_bar_explain"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/copyAction"
-        android:title="@string/text_bar_copy_button_text"
+        android:title="@string/document_action_bar_copy"
         app:showAsAction="ifRoom"/>
 
 </menu>

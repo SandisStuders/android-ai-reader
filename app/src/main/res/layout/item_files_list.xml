@@ -25,7 +25,7 @@
             android:id="@+id/file_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder_file_name"
+            android:text="@string/file_info_filename_default"
             android:layout_toEndOf="@id/image_thumbnail"
             android:layout_marginStart="15dp"
             style="@style/NameTextStyle"
@@ -40,7 +40,7 @@
             android:layout_toEndOf="@id/image_thumbnail"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
-            android:text="@string/placeholder_file_type"
+            android:text="@string/file_info_file_type_default"
             style="@style/DetailsTextStyle"/>
 
         <TextView
@@ -51,7 +51,7 @@
             android:layout_toEndOf="@id/file_type"
             android:layout_marginTop="8dp"
             android:layout_marginStart="20dp"
-            android:text="@string/placeholder_creation_date"
+            android:text="@string/file_info_date_default"
             style="@style/DetailsTextStyle"/>
 
         <TextView
@@ -62,7 +62,7 @@
             android:layout_toEndOf="@id/file_creation_date"
             android:layout_marginTop="8dp"
             android:layout_marginStart="20dp"
-            android:text="@string/placeholder_file_size"
+            android:text="@string/file_info_file_size_default"
             style="@style/DetailsTextStyle"/>
 
         <TextView
@@ -73,7 +73,7 @@
             android:layout_toEndOf="@id/image_thumbnail"
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
-            android:text="@string/placeholder_file_relative_path"
+            android:text="@string/file_info_relative_path_default"
             style="@style/DetailsTextStyle"
             android:ellipsize="middle"
             android:maxLines="1"/>

@@ -48,11 +48,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("To access and display documents on your device the app needs access to your File System. After pressing \"OK\", please enable the access for AI Reader app in the appearing settings window. The access to your file system will be used only in the context of finding and displaying your document files to you.")
-                        .setTitle("Android File System Access");
+                String alertText = getString(R.string.storage_access_alert_text);
+                String alertTitle = getString(R.string.storage_access_alert_title);
+                String alertButtonOk = getString(R.string.storage_access_alert_button_ok);
 
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(alertText)
+                        .setTitle(alertTitle);
+
+                builder.setPositiveButton(alertButtonOk, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent();
                         intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
@@ -100,10 +104,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
-    }
-
-    private void restartActivity() {
-        finish();  // Finish the current instance of the activity
     }
 
     private void loadFileViewerFragment() {

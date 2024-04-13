@@ -24,7 +24,7 @@
                     android:id="@+id/selectionTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="@string/response_selected_text_default"
                     android:padding="16dp"
                     android:textSize="16sp"/>
 
@@ -32,7 +32,7 @@
                     android:id="@+id/responseTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="@string/response_ai_response_default"
                     android:padding="16dp"
                     android:textSize="16sp"/>
             </LinearLayout>

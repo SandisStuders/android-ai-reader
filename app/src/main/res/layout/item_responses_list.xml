@@ -18,7 +18,7 @@
             android:id="@+id/response_file_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder_response_file_name"
+            android:text="@string/file_info_filename_default"
             android:layout_marginStart="15dp"
             style="@style/NameTextStyle"
             android:ellipsize="middle"
@@ -31,7 +31,7 @@
             android:layout_below="@id/response_file_name"
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
-            android:text="@string/placeholder_response_selected_text"
+            android:text="@string/response_selected_text_default"
             style="@style/DetailsTextStyle"
             android:maxLines="3"/>
 
@@ -44,7 +44,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
             android:maxLines="2"
-            android:text="@string/placeholder_gpt_response" />
+            android:text="@string/response_ai_response_default" />
 
     </RelativeLayout>
 
