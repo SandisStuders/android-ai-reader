@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI Reader</string>
+
+    <!-- REUSABLE STRINGS -->
+    <string name="file_info_filename_default">Nezināms fails</string>
+    <string name="file_info_date_default">Nezināms datums</string>
+    <string name="file_info_file_type_default">Dokuments</string>
+    <string name="file_info_file_size_default">0.00 KB</string>
+    <string name="file_info_relative_path_default">/</string>
+
+    <string name="action_open">Atvērt</string>
+    <string name="action_delete">Izdzēst</string>
+
+    <string name="popup_menu_add_favorite">Pievienot favorītiem</string>
+    <string name="popup_menu_remove_favorite">Noņemt no favorītiem</string>
+    <string name="popup_menu_remove_recent">Noņemt no nesenajiem failiem</string>
+
+    <!-- UI SPECIFIC SCREEN STRINGS -->
+    <!-- File List Viewer Screen -->
+    <string name="file_navbar_recent">Nesenie</string>
+    <string name="file_navbar_favorites">Favorīti</string>
+    <string name="file_navbar_all">Visi faili</string>
+
+    <string name="storage_access_alert_text">Lai piekļūtu un parādītu šīs ierīces dokumentus, aplikācijai ir nepieciešama pieeja jūsu Failu Sistēmai. Pēc
+        "OK" pogas nospiešanas, lūdzu ieslēdziet piekļuvi AI Reader aplikācijai atvērtajā iestatījumu lodziņā. Pieeja jūsu failu sistēmai tiks izmantota
+        tikai jūsu dokumentu atrašanas un parādīšanas kontekstā
+        </string>
+    <string name="storage_access_alert_title">Android Failu Sistēmas Pieeja</string>
+    <string name="storage_access_alert_button_ok">OK</string>
+
+    <!-- Document Viewer Screen -->
+    <string name="document_button_next_chapter">Nākamā nodaļa</string>
+    <string name="document_button_previous_chapter">Iepriekšējā nodaļa</string>
+    <string name="document_button_select_chapter">Izvēlēties nodaļu</string>
+    <string name="document_action_bar_explain">Paskaidrot</string>
+    <string name="document_action_bar_copy">Kopēt</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_category_general">Vispārīgi</string>
+    <string name="settings_category_privacy">Privātums</string>
+    <string name="settings_category_personal_prompt">Personīgais prompts</string>
+    <string name="settings_category_advanced">Papildu iestatījumi</string>
+
+    <string name="settings_preference_theme">Motīvs</string>
+    <string name="settings_preference_language">Valoda</string>
+    <string name="settings_preference_send_document_name">Sūtīt Dokumenta Nosaukumu</string>
+    <string name="settings_preference_personal_prompt_enable">Ieslēgt Personīgo Promptu</string>
+    <string name="settings_preference_personal_prompt_name">Personīgā Prompta Nosaukums</string>
+    <string name="settings_preference_personal_prompt_define">Definēt Personīgo Promptu</string>
+    <string name="settings_preference_temperature">Temperatūras Procenti</string>
+
+    <string name="settings_dialogue_title_theme">Izvēlieties aplikācijas vizuālo motīvu</string>
+    <string name="settings_dialogue_title_language">Izvēlieties aplikācijas valodu</string>
+    <string name="settings_dialogue_title_personal_prompt_name">Ievadiet sava personīgā prompta nosaukumu</string>
+    <string name="settings_dialogue_title_personal_prompt_define">Definējiet savu personīgo promptu</string>
+
+    <string name="settings_description_send_document_name">Jūsu dokumenta nosaukums tiks aizsūtīts mākslīgā intelekta asistentam kā papildus konteksts</string>
+    <string name="settings_description_personal_prompt_enable">Pievieno jūsu personīgo promptu, kas tiks nosūtīts mākslīgā intelekta asistentam kopā ar jūsu izvēlēto tekstu</string>
+    <string name="settings_description_personal_prompt_name">Ievadiet sava personīgā prompta nosaukumu, kas parādīsies, kad jūs dokumenta iezīmējat tekstu</string>
+    <string name="settings_description_personal_prompt_define">Definējiet savu personīgo promptu, kas tiks nosūtīts mākslīgā intelekta asistentam kopā ar jūsu izvēlēto tekstu</string>
+
+    <string name="settings_default_personal_prompt_name">Personīgais Prompts</string>
+
+    <!-- Response Viewer Screen -->
+    <string name="response_selected_text_default">Nav izvēlētā teksta</string>
+    <string name="response_ai_response_default">Nav atbildes</string>
+
+    <!-- Toolbar -->
+    <string name="toolbar_history">Vēsture</string>
+    <string name="toolbar_settings">Iestatījumi</string>
+</resources>

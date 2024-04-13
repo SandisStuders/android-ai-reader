@@ -40,6 +40,7 @@
     <string name="settings_category_advanced">Advanced settings</string>
 
     <string name="settings_preference_theme">Theme</string>
+    <string name="settings_preference_language">Language</string>
     <string name="settings_preference_send_document_name">Send Document Name</string>
     <string name="settings_preference_personal_prompt_enable">Enable Personal Prompt</string>
     <string name="settings_preference_personal_prompt_name">Personal Prompt Name</string>
@@ -47,6 +48,7 @@
     <string name="settings_preference_temperature">Temperature Percentage</string>
 
     <string name="settings_dialogue_title_theme">Set the visual theme of the application</string>
+    <string name="settings_dialogue_title_language">Set the language of the application</string>
     <string name="settings_dialogue_title_personal_prompt_name">Insert the name of your personal prompt</string>
     <string name="settings_dialogue_title_personal_prompt_define">Define your personal prompt</string>
 

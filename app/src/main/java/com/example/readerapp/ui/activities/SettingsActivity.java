@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
@@ -20,22 +21,21 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("MyLogs", "onCreate started");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         context = this;
 
-        Log.d("MyLogs", "onCreate reached line");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals("theme")) {
                     changeAppTheme(context);
+                } else if (key.equals("language")) {
+                    changeAppLanguage(context);
                 }
             }
         };
-        Log.d("MyLogs", "onCreate passed line");
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.settings_container, new SettingsFragment())
@@ -44,10 +44,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.d("MyLogs", "onResume started");
         super.onResume();
         // Register the listener
-        Log.d("MyLogs", "onResume reached line");
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
     }
 
@@ -71,4 +69,11 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    private void changeAppLanguage(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String lang = sharedPreferences.getString("language", "0");
+
+        LocaleListCompat appLocale = LocaleListCompat.forLanguageTags(lang);
+        AppCompatDelegate.setApplicationLocales(appLocale);
+    }
 }

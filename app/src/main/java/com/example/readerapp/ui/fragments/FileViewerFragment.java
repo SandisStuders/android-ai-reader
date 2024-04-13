@@ -50,7 +50,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("MyLogs", "ON CREATE METHOD LAUNCHED");
         binding = FragmentFileViewerBinding.inflate(inflater, container, false);
 
         filesRecyclerView = binding.filesRecyclerView;
@@ -59,13 +58,11 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
 
         ArrayList<ReadableFile> fileDetails = getEpubFileList();
-        Log.d("MyLogs", "OBTAINED FILE DETAILS FOR INSERTION: " + fileDetails.size());
         mReadableFileViewModel.insert(fileDetails);
 
         FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
         currentListType = "RECENT";
         adapter.setCurrentListType(currentListType);
-        Log.d("MyLogs", "READABLE FILE DETAILS CHANGED VIA CREATION. SIZE: " + recentFileDetails.size());
         adapter.setReadableFileDetails(recentFileDetails);
 
         filesRecyclerView.setAdapter(adapter);
@@ -79,26 +76,16 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 if (itemId == R.id.recentFiles) {
                     currentListType = "RECENT";
                     adapter.setCurrentListType(currentListType);
-                    Log.d("MyLogs", "READABLE FILE DETAILS CHANGED VIA Navigation to Recent. SIZE: " + recentFileDetails.size());
                     adapter.setReadableFileDetails(recentFileDetails);
                     return true;
                 } else if (itemId == R.id.favoriteFiles) {
                     currentListType = "FAVORITE";
                     adapter.setCurrentListType(currentListType);
-                    Log.d("MyLogs", "READABLE FILE DETAILS CHANGED VIA Navigation to Favorites. SIZE: " + favoriteFileDetails.size());
                     adapter.setReadableFileDetails(favoriteFileDetails);
                     return true;
                 } else if (itemId == R.id.allFiles) {
-                    Log.d("MyLogs", "ALL FILES BUTTON PRESSED");
-                    Log.d("MyLogs", "CURRENT LIST TYPE BEFORE CHANGING: " + currentListType);
-                    int adapterItemCount = adapter.getItemCount();
-                    Log.d("MyLogs", "ITEMS IN ADAPTER BEFORE CHANGING: " + adapterItemCount);
-                    ArrayList<ReadableFile> fileDetails = getEpubFileList();
-                    Log.d("MyLogs", "ALL FILES SELECTED. PDF FILE LIST OBTAINED. SIZE: " + fileDetails.size());
-
                     currentListType = "ALL";
                     adapter.setCurrentListType(currentListType);
-                    Log.d("MyLogs", "READABLE FILE DETAILS CHANGED VIA Navigation to All. SIZE: " + allFileDetails.size());
                     adapter.setReadableFileDetails(allFileDetails);
                     return true;
                 }
@@ -113,7 +100,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 if (readableFiles != null) {
                     favoriteFileDetails = (ArrayList<ReadableFile>) readableFiles;
                     if (Objects.equals(currentListType, "FAVORITE")) {
-                        Log.d("MyLogs", "READABLE FILE DETAILS CHANGED VIA FavoriteObserver. SIZE: " + readableFiles.size());
                         adapter.setReadableFileDetails(favoriteFileDetails);
                     }
                 }
@@ -123,11 +109,9 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
             @Override
             public void onChanged(List<ReadableFile> readableFiles) {
-                Log.d("MyLogs", "ALL FILES CHANGED. SIZE: " + readableFiles.size());
                 if (readableFiles != null) {
                     allFileDetails = (ArrayList<ReadableFile>) readableFiles;
                     if (Objects.equals(currentListType, "ALL")) {
-                        Log.d("MyLogs", "READABLE FILE DETAILS CHANGED VIA AllObserver. SIZE: " + readableFiles.size());
                         adapter.setReadableFileDetails(allFileDetails);
                     }
                 }
@@ -140,7 +124,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 if (readableFiles != null) {
                     recentFileDetails = (ArrayList<ReadableFile>) readableFiles;
                     if (Objects.equals(currentListType, "RECENT")) {
-                        Log.d("MyLogs", "READABLE FILE DETAILS CHANGED VIA RecentObserver. SIZE: " + readableFiles.size());
                         adapter.setReadableFileDetails(recentFileDetails);
                     }
                 }
@@ -177,7 +160,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
         try (Cursor cursor = getContext().getContentResolver().query(queryUri, projection, selection, selectionArgs, null)) {
             if (cursor != null && cursor.moveToFirst()) {
-                Log.d("MyLogs", "CURSOR NOT NULL");
                 String[] colNames = cursor.getColumnNames();
 
                 int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);

@@ -9,6 +9,13 @@
             android:entries="@array/pref_theme_titles"
             android:entryValues="@array/pref_theme_values"
             android:defaultValue="0"/>
+        <ListPreference
+            android:key="language"
+            android:title="@string/settings_preference_language"
+            android:dialogTitle="@string/settings_dialogue_title_language"
+            android:entries="@array/pref_language_titles"
+            android:entryValues="@array/pref_language_values"
+            android:defaultValue="0"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings_category_privacy">

@@ -1,9 +1,12 @@
 package com.example.readerapp.ui.activities;
 
+import android.app.LocaleManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,12 +23,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.os.LocaleListCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
 import com.example.readerapp.databinding.ActivityMainBinding;
 import com.example.readerapp.ui.fragments.FileViewerFragment;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MyLogs", "Main Activity Created");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
@@ -101,6 +108,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        Log.d("MyLogs", "Main Activity Resumed");
+        super.onResume();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
@@ -111,5 +124,4 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.file_viewer_fragment, new FileViewerFragment())
                 .commit();
     }
-
 }
