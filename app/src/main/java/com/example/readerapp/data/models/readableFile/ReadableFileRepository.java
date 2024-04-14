@@ -52,4 +52,10 @@ public class ReadableFileRepository {
         });
     }
 
+    public void deleteFiles(ArrayList<ReadableFile> readableFiles) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            mReadableFileDao.deleteFiles(readableFiles);
+        });
+    }
+
 }

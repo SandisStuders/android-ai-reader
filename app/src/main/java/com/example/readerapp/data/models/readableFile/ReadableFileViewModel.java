@@ -41,4 +41,8 @@ public class ReadableFileViewModel extends AndroidViewModel {
         mRepository.update(readableFile);
     }
 
+    public void deleteFiles(ArrayList<ReadableFile> readableFiles) {
+        mRepository.deleteFiles(readableFiles);
+    }
+
 }

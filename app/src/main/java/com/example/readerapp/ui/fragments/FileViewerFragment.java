@@ -31,8 +31,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class FileViewerFragment extends Fragment implements FilesRecyclerViewAdapter.FileOptionListener {
 
@@ -111,7 +113,27 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             @Override
             public void onChanged(List<ReadableFile> readableFiles) {
                 if (readableFiles != null) {
+                    ArrayList<ReadableFile> filesOnDevice = getEpubFileList();
                     allFileDetails = (ArrayList<ReadableFile>) readableFiles;
+
+                    Set<String> deviceFilePaths = new HashSet<>();
+                    for (ReadableFile file : filesOnDevice) {
+                        String fileFullPath = file.getRelativePath() + file.getFileName();
+                        deviceFilePaths.add(fileFullPath);
+                    }
+
+                    ArrayList<ReadableFile> filesToDelete = new ArrayList<>();
+                    for (ReadableFile dbFile : readableFiles) {
+                        String fileFullPath = dbFile.getRelativePath() + dbFile.getFileName();
+                        if (!deviceFilePaths.contains(fileFullPath)) {
+                            filesToDelete.add(dbFile);
+                        }
+                    }
+
+                    if (!filesToDelete.isEmpty()) {
+                        mReadableFileViewModel.deleteFiles(filesToDelete);
+                    }
+
                     if (Objects.equals(currentListType, "ALL")) {
                         adapter.setReadableFileDetails(allFileDetails);
                     }

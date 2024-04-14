@@ -37,4 +37,7 @@ public interface ReadableFileDao {
     @Delete
     void deleteFile(ReadableFile readableFile);
 
+    @Delete
+    void deleteFiles(ArrayList<ReadableFile> readableFiles);
+
 }
