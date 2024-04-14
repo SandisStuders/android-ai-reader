@@ -40,6 +40,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     private RecyclerView filesRecyclerView;
     private BottomNavigationView bottomFileListSelectionBar;
+    private FilesRecyclerViewAdapter adapter;
 
     private ReadableFileViewModel mReadableFileViewModel;
     private ArrayList<ReadableFile> favoriteFileDetails = new ArrayList<>();
@@ -60,7 +61,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         ArrayList<ReadableFile> fileDetails = getEpubFileList();
         mReadableFileViewModel.insert(fileDetails);
 
-        FilesRecyclerViewAdapter adapter = new FilesRecyclerViewAdapter(this);
+        adapter = new FilesRecyclerViewAdapter(this);
         currentListType = "RECENT";
         adapter.setCurrentListType(currentListType);
         adapter.setReadableFileDetails(recentFileDetails);
@@ -230,5 +231,27 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         intent.putExtra("FILE_NAME", fileName);
         intent.putExtra("FILE_RELATIVE_PATH", fileRelativePath);
         context.startActivity(intent);
+    }
+
+    public String getCurrentListType() {
+        return currentListType;
+    }
+
+    public void setCurrentState(String state) {
+        if (adapter != null) {
+            if (Objects.equals(state, "RECENT")) {
+                currentListType = "RECENT";
+                adapter.setCurrentListType(currentListType);
+                adapter.setReadableFileDetails(recentFileDetails);
+            } else if (Objects.equals(state, "FAVORITE")) {
+                currentListType = "FAVORITE";
+                adapter.setCurrentListType(currentListType);
+                adapter.setReadableFileDetails(favoriteFileDetails);
+            } else if (Objects.equals(state, "ALL")) {
+                currentListType = "ALL";
+                adapter.setCurrentListType(currentListType);
+                adapter.setReadableFileDetails(allFileDetails);
+            }
+        }
     }
 }

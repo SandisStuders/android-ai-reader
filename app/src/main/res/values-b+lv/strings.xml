@@ -16,6 +16,8 @@
     <string name="popup_menu_remove_favorite">Noņemt no favorītiem</string>
     <string name="popup_menu_remove_recent">Noņemt no nesenajiem failiem</string>
 
+    <string name="alert_button_ok">OK</string>
+
     <!-- UI SPECIFIC SCREEN STRINGS -->
     <!-- File List Viewer Screen -->
     <string name="file_navbar_recent">Nesenie</string>
@@ -27,7 +29,6 @@
         tikai jūsu dokumentu atrašanas un parādīšanas kontekstā
         </string>
     <string name="storage_access_alert_title">Android Failu Sistēmas Pieeja</string>
-    <string name="storage_access_alert_button_ok">OK</string>
 
     <!-- Document Viewer Screen -->
     <string name="document_button_next_chapter">Nākamā nodaļa</string>
@@ -35,6 +36,10 @@
     <string name="document_button_select_chapter">Izvēlēties nodaļu</string>
     <string name="document_action_bar_explain">Paskaidrot</string>
     <string name="document_action_bar_copy">Kopēt</string>
+
+    <string name="document_selection_alert_title">Izvēlētais teksts ir pārāk garš!</string>
+    <string name="document_selection_alert_text_1">Atvainojiet! Šobrīd tikai teksts līdz&#xA0;</string>
+    <string name="document_selection_alert_text_2">&#xA0;simboliem var tikt paskaidrots ar AI.</string>
 
     <!-- Settings Screen -->
     <string name="settings_category_general">Vispārīgi</string>

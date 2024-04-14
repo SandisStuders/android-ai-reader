@@ -82,7 +82,7 @@ public class ReaderView extends WebView {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
                 boolean personalPromptEnabled = sharedPreferences.getBoolean("personal_prompt_enable", false);
                 if (personalPromptEnabled) {
-                    String personalPromptName = sharedPreferences.getString("personal_prompt_name", "defaultName");
+                    String personalPromptName = sharedPreferences.getString("personal_prompt_name", "Personal Prompt");
                     personalPromptItem = menu.add(personalPromptName);
                 }
 

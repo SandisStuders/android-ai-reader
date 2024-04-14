@@ -16,6 +16,8 @@
     <string name="popup_menu_remove_favorite">Remove from favorites</string>
     <string name="popup_menu_remove_recent">Remove from recent</string>
 
+    <string name="alert_button_ok">OK</string>
+
     <!-- UI SPECIFIC SCREEN STRINGS -->
     <!-- File List Viewer Screen -->
     <string name="file_navbar_recent">Recent</string>
@@ -24,7 +26,6 @@
 
     <string name="storage_access_alert_text">To access and display documents on your device the app needs access to your File System. After pressing "OK", please enable the access for AI Reader app in the appearing settings window. The access to your file system will be used only in the context of finding and displaying your document files to you.</string>
     <string name="storage_access_alert_title">Android File System Access</string>
-    <string name="storage_access_alert_button_ok">OK</string>
 
     <!-- Document Viewer Screen -->
     <string name="document_button_next_chapter">Next chapter</string>
@@ -32,6 +33,10 @@
     <string name="document_button_select_chapter">Select chapter</string>
     <string name="document_action_bar_explain">Explain</string>
     <string name="document_action_bar_copy">Copy</string>
+
+    <string name="document_selection_alert_title">Selected text too long!</string>
+    <string name="document_selection_alert_text_1">Sorry! Currently, only text up to&#xA0;</string>
+    <string name="document_selection_alert_text_2">&#xA0;symbols can be processed by AI.</string>
 
     <!-- Settings Screen -->
     <string name="settings_category_general">General</string>

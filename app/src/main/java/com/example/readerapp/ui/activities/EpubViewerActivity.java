@@ -2,17 +2,20 @@ package com.example.readerapp.ui.activities;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -49,6 +52,8 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     String fileName;
     String fileRelativePath;
     private GptResponseViewModel mGptResponseViewModel;
+
+    private final int SELECTED_TEXT_MAX_CHARS = 600;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +148,27 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
     @Override
     public void onTextSelected(String selectedText, boolean useDefaultSystemPrompt) {
+        if (selectedText.length() > SELECTED_TEXT_MAX_CHARS) {
+            String alertTitle = getString(R.string.document_selection_alert_title);
+            String alertText1 = getString(R.string.document_selection_alert_text_1);
+            String alertText2 = getString(R.string.document_selection_alert_text_2);
+            String alertButtonOk = getString(R.string.alert_button_ok);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(alertText1 + SELECTED_TEXT_MAX_CHARS + alertText2)
+                    .setTitle(alertTitle);
+
+            builder.setPositiveButton(alertButtonOk, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            return;
+        }
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // 'context' refers to the Activity or Context object
         int temperaturePercentage = sharedPreferences.getInt("temperature", 40);
 

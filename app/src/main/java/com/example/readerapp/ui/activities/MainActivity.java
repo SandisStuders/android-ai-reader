@@ -1,12 +1,8 @@
 package com.example.readerapp.ui.activities;
 
-import android.app.LocaleManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,19 +15,17 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.os.LocaleListCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
 import com.example.readerapp.databinding.ActivityMainBinding;
 import com.example.readerapp.ui.fragments.FileViewerFragment;
 
-import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             if (!Environment.isExternalStorageManager()) {
                 String alertText = getString(R.string.storage_access_alert_text);
                 String alertTitle = getString(R.string.storage_access_alert_title);
-                String alertButtonOk = getString(R.string.storage_access_alert_button_ok);
+                String alertButtonOk = getString(R.string.alert_button_ok);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(alertText)
@@ -81,6 +75,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) { // Check to prevent adding the fragment again on rotate
             loadFileViewerFragment();
+        } else {
+            String selectedItemId = savedInstanceState.getString("selected_nav_item", "");
+            FileViewerFragment fragment = (FileViewerFragment) getSupportFragmentManager().findFragmentByTag("FileViewerFragmentTag");
+            if (!Objects.equals(selectedItemId, "") && fragment != null) {
+                Log.d("MyLogs", "We got the fragment");
+                fragment.setCurrentState(selectedItemId);
+            }
         }
 
         appToolbar = binding.appToolbar;
@@ -121,7 +122,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadFileViewerFragment() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.file_viewer_fragment, new FileViewerFragment())
+                .replace(R.id.file_viewer_fragment, new FileViewerFragment(), "FileViewerFragmentTag")
                 .commit();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        FileViewerFragment fragment = (FileViewerFragment) getSupportFragmentManager().findFragmentByTag("FileViewerFragmentTag");
+        if (fragment != null) {
+            String currentListType = fragment.getCurrentListType();
+            outState.putString("selected_nav_item", currentListType);
+        }
     }
 }
