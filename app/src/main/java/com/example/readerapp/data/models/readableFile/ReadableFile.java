@@ -131,4 +131,8 @@ public class ReadableFile {
                 ", isFavorite=" + isFavorite +
                 '}';
     }
+
+    public String getFullPath() {
+        return relativePath + fileName;
+    }
 }

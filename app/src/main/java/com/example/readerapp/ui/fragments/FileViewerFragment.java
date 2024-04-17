@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +31,9 @@ import com.example.readerapp.utils.HelperFunctions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -239,6 +243,11 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     @Override
     public void fileOpened(ReadableFile readableFile, View v) {
+        Uri contentUri = Uri.parse(readableFile.getContentUri());
+        if (!fileExists(contentUri, v.getContext())) {
+            return;
+        }
+
         long currentTimeMillis = System.currentTimeMillis();
         readableFile.setMostRecentAccessTime(currentTimeMillis);
         mReadableFileViewModel.update(readableFile);
@@ -275,5 +284,19 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 adapter.setReadableFileDetails(allFileDetails);
             }
         }
+    }
+
+    private boolean fileExists(Uri uri, Context context) {
+        boolean exists = false;
+        if(null != uri) {
+            try {
+                InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                inputStream.close();
+                exists = true;
+            } catch (Exception e) {
+                Log.d("MyLogs", "File corresponding to the uri does not exist " + uri.toString());
+            }
+        }
+        return exists;
     }
 }
