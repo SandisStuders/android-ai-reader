@@ -67,10 +67,22 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         ArrayList<ReadableFile> fileDetails = getEpubFileList();
         mReadableFileViewModel.insert(fileDetails);
 
+        if (savedInstanceState == null) {
+            currentListType = "RECENT";
+        } else {
+            currentListType = savedInstanceState.getString("CURRENT_LIST_TYPE", "RECENT");
+        }
+
         adapter = new FilesRecyclerViewAdapter(this);
-        currentListType = "RECENT";
         adapter.setCurrentListType(currentListType);
-        adapter.setReadableFileDetails(recentFileDetails);
+
+        if (Objects.equals(currentListType, "RECENT")) {
+            adapter.setReadableFileDetails(recentFileDetails);
+        } else if (Objects.equals(currentListType, "FAVORITE")) {
+            adapter.setReadableFileDetails(favoriteFileDetails);
+        } else if (Objects.equals(currentListType, "ALL")) {
+            adapter.setReadableFileDetails(allFileDetails);
+        }
 
         filesRecyclerView.setAdapter(adapter);
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -156,6 +168,12 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 }
             }
         });
+
+        if (savedInstanceState != null) {
+            Log.d("MyLogs", "Fragment saved instance state in onCreate is not null");
+            String listType = savedInstanceState.getString("CURRENT_LIST_TYPE", "RECENT");
+            Log.d("MyLogs", "GOT LIST TYPE: " + listType);
+        }
 
         return binding.getRoot();
     }
@@ -268,24 +286,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         return currentListType;
     }
 
-    public void setCurrentState(String state) {
-        if (adapter != null) {
-            if (Objects.equals(state, "RECENT")) {
-                currentListType = "RECENT";
-                adapter.setCurrentListType(currentListType);
-                adapter.setReadableFileDetails(recentFileDetails);
-            } else if (Objects.equals(state, "FAVORITE")) {
-                currentListType = "FAVORITE";
-                adapter.setCurrentListType(currentListType);
-                adapter.setReadableFileDetails(favoriteFileDetails);
-            } else if (Objects.equals(state, "ALL")) {
-                currentListType = "ALL";
-                adapter.setCurrentListType(currentListType);
-                adapter.setReadableFileDetails(allFileDetails);
-            }
-        }
-    }
-
     private boolean fileExists(Uri uri, Context context) {
         boolean exists = false;
         if(null != uri) {
@@ -298,5 +298,15 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             }
         }
         return exists;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        // Make sure to call the super method so that the states of our views are saved
+        super.onSaveInstanceState(outState);
+        outState.putString("CURRENT_LIST_TYPE", currentListType);
+        // Save our own state now
+        Log.d("MyLogs", "Fragment onSaveInstanceState gets called");
+        Log.d("MyLogs", "PUT LIST TYPE: " + currentListType);
     }
 }

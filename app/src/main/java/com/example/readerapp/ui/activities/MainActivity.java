@@ -76,12 +76,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) { // Check to prevent adding the fragment again on rotate
             loadFileViewerFragment();
         } else {
-            String selectedItemId = savedInstanceState.getString("selected_nav_item", "");
-            FileViewerFragment fragment = (FileViewerFragment) getSupportFragmentManager().findFragmentByTag("FileViewerFragmentTag");
-            if (!Objects.equals(selectedItemId, "") && fragment != null) {
-                Log.d("MyLogs", "We got the fragment");
-                fragment.setCurrentState(selectedItemId);
-            }
+            Log.d("MyLogs", "onCreate method with savedInstanceState bundle");
         }
 
         appToolbar = binding.appToolbar;
@@ -129,10 +124,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        FileViewerFragment fragment = (FileViewerFragment) getSupportFragmentManager().findFragmentByTag("FileViewerFragmentTag");
-        if (fragment != null) {
-            String currentListType = fragment.getCurrentListType();
-            outState.putString("selected_nav_item", currentListType);
-        }
+        Log.d("MyLogs", "Activity onSaveInstanceState gets called");
     }
 }

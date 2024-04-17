@@ -70,7 +70,11 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
         epubViewer.setActionModeCallback(this);
 
-        currentChapter = 0;
+        if (savedInstanceState == null) {
+            currentChapter = 0;
+        } else {
+            currentChapter = savedInstanceState.getInt("CURRENT_CHAPTER", 0);
+        }
         bookData = new ArrayList<>();
 
         epubViewer.getSettings().setJavaScriptEnabled(true);
@@ -125,7 +129,6 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                     for (int i = 0; i < bookData.size(); i++) {
                         chapters[i] = String.valueOf(i);
                     }
-
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Select a Chapter");
@@ -233,5 +236,11 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                 context.startActivity(intent);
             });
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("CURRENT_CHAPTER", currentChapter);
     }
 }
