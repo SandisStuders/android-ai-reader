@@ -67,6 +67,7 @@ public class ResponseHistoryViewerActivity extends AppCompatActivity implements 
         Intent intent = new Intent(context, ResponseViewerActivity.class);
         intent.putExtra("SELECTION", gptResponse.getSelectedText());
         intent.putExtra("RESPONSE", gptResponse.getResponse());
+        intent.putExtra("FILENAME", gptResponse.getSourceReadableFile());
         context.startActivity(intent);
     }
 

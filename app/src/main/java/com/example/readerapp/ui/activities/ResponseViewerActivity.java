@@ -13,7 +13,7 @@ import com.example.readerapp.databinding.ActivityResponseViewerBinding;
 public class ResponseViewerActivity extends AppCompatActivity {
 
     ActivityResponseViewerBinding binding;
-    TextView selectionTextView, responseTextView;
+    TextView fileNameTextView, selectionTextView, responseTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,15 +22,24 @@ public class ResponseViewerActivity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_response_viewer);
 
+        fileNameTextView = binding.fileNameTextView;
         selectionTextView = binding.selectionTextView;
         responseTextView = binding.responseTextView;
 
         Intent intent = getIntent();
+        String fileName = intent.getStringExtra("FILENAME");
         String selection = intent.getStringExtra("SELECTION");
         String response = intent.getStringExtra("RESPONSE");
 
-        selectionTextView.setText(selection);
-        responseTextView.setText(response);
+        if (fileName != null) {
+            fileNameTextView.setText(fileName);
+        }
+        if (selection != null) {
+            selectionTextView.setText(selection);
+        }
+        if (response != null) {
+            responseTextView.setText(response);
+        }
     }
 
 }

@@ -21,4 +21,21 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <!-- Response Viewer Styles -->
+    <style name="response_filename_style">
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_secondary_color</item>
+    </style>
+    <style name="response_label_style">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/app_secondary_color</item>
+    </style>
+    <style name="response_selected_text_style">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="response_ai_response_style">
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

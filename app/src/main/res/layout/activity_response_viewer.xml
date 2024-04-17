@@ -21,20 +21,54 @@
                 android:orientation="vertical" >
 
                 <TextView
+                    android:id="@+id/fileNameTextView"
+                    style="@style/response_filename_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/file_info_filename_default"
+                    android:paddingTop="32dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
+
+                <TextView
+                    android:id="@+id/selectedTextLabel"
+                    style="@style/response_label_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/response_selected_text_label"
+                    android:paddingTop="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
+
+                <TextView
                     android:id="@+id/selectionTextView"
+                    style="@style/response_selected_text_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/response_selected_text_default"
-                    android:padding="16dp"
-                    android:textSize="16sp"/>
+                    android:paddingTop="8dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
+
+                <TextView
+                    android:id="@+id/responseLabel"
+                    style="@style/response_label_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/response_ai_response_label"
+                    android:paddingTop="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
 
                 <TextView
                     android:id="@+id/responseTextView"
+                    style="@style/response_ai_response_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/response_ai_response_default"
-                    android:padding="16dp"
-                    android:textSize="16sp"/>
+                    android:paddingTop="8dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
             </LinearLayout>
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -64,9 +64,13 @@
 
     <string name="settings_default_personal_prompt_name">Personal Prompt</string>
 
-    <!-- Response Viewer Screen -->
+    <!-- Response History Viewer Screen -->
     <string name="response_selected_text_default">No selected text</string>
     <string name="response_ai_response_default">No response</string>
+
+    <!-- Response Viewer Screen -->
+    <string name="response_selected_text_label">Selection</string>
+    <string name="response_ai_response_label">AI Response</string>
 
     <!-- Toolbar -->
     <string name="toolbar_history">History</string>

@@ -265,6 +265,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                 Intent intent = new Intent(context, ResponseViewerActivity.class);
                 intent.putExtra("SELECTION", selectedText);
                 intent.putExtra("RESPONSE", response);
+                intent.putExtra("FILENAME", fileName);
                 context.startActivity(intent);
             });
         });

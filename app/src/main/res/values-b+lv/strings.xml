@@ -67,9 +67,13 @@
 
     <string name="settings_default_personal_prompt_name">Personīgais Prompts</string>
 
-    <!-- Response Viewer Screen -->
+    <!-- Response History Viewer Screen -->
     <string name="response_selected_text_default">Nav izvēlētā teksta</string>
     <string name="response_ai_response_default">Nav atbildes</string>
+
+    <!-- Response Viewer Screen -->
+    <string name="response_selected_text_label">Izvēle</string>
+    <string name="response_ai_response_label">AI Atbilde</string>
 
     <!-- Toolbar -->
     <string name="toolbar_history">Vēsture</string>
