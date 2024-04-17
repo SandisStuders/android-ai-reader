@@ -52,6 +52,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     String fileName;
     String fileRelativePath;
     private GptResponseViewModel mGptResponseViewModel;
+    Context context;
 
     private final int SELECTED_TEXT_MAX_CHARS = 600;
 
@@ -59,6 +60,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_viewer);
+        context = this;
 
         mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
 
@@ -119,8 +121,25 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                     }
                     return true;
                 } else if (itemId == R.id.selectChapter) {
-                    Toast toast = Toast.makeText(binding.getRoot().getContext() , "Select chapter", Toast.LENGTH_SHORT);
-                    toast.show();
+                    String[] chapters = new String[bookData.size()];
+                    for (int i = 0; i < bookData.size(); i++) {
+                        chapters[i] = String.valueOf(i);
+                    }
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Select a Chapter");
+
+                    builder.setItems(chapters, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            currentChapter = which;
+                            loadCurrentChapter();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
                     return true;
                 } else if (itemId == R.id.nextChapter) {
                     if (currentChapter < bookData.size() - 1) {
