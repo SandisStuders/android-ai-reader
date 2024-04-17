@@ -143,7 +143,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                 } else if (itemId == R.id.selectChapter) {
                     String[] chapters = new String[bookData.size()];
                     for (int i = 0; i < bookData.size(); i++) {
-                        chapters[i] = String.valueOf(i);
+                        chapters[i] = String.valueOf(i+1);
                     }
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
