@@ -32,6 +32,9 @@ public class ReadableFileViewModel extends AndroidViewModel {
     public LiveData<List<ReadableFile>> getFavoriteFiles() { return mFavoriteFiles; }
 
     public LiveData<List<ReadableFile>> getRecentFiles() { return mRecentFiles; }
+    public LiveData<ReadableFile> getReadableFileByPrimaryKey(String fileName, String relativePath) {
+        return mRepository.getReadableFileByPrimaryKey(fileName, relativePath);
+    }
 
     public void insert(ReadableFile readableFile) { mRepository.insert(readableFile); }
 

@@ -25,6 +25,9 @@ public interface ReadableFileDao {
     @Query("SELECT * FROM readableFiles WHERE mostRecentAccessTime > 0 ORDER BY mostRecentAccessTime DESC LIMIT 15")
     LiveData<List<ReadableFile>> getRecentFiles();
 
+    @Query("SELECT * FROM readableFiles WHERE fileName = :fileName AND relativePath = :relativePath")
+    LiveData<ReadableFile> getReadableFileByPrimaryKey(String fileName, String relativePath);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertFiles(ReadableFile... readableFiles);
 

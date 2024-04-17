@@ -18,12 +18,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
 import com.example.readerapp.data.models.gptResponse.GptResponse;
 import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
+import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.readableFile.ReadableFileViewModel;
 import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.example.readerapp.ui.customViews.ReaderView;
@@ -49,9 +52,9 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     BottomNavigationView bottomAppBar;
     int currentChapter;
     ArrayList<String> bookData;
-    String fileName;
-    String fileRelativePath;
+    ReadableFile sourceFile;
     private GptResponseViewModel mGptResponseViewModel;
+    private ReadableFileViewModel mReadableFileViewModel;
     Context context;
 
     private final int SELECTED_TEXT_MAX_CHARS = 600;
@@ -63,6 +66,8 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         context = this;
 
         mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
+        mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
+
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
         epubViewer = binding.epubViewer;
@@ -80,9 +85,20 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         epubViewer.getSettings().setJavaScriptEnabled(true);
 
         Intent intent = getIntent();
+
+        String fileName = intent.getStringExtra("FILE_NAME");
+        String fileRelativePath = intent.getStringExtra("FILE_RELATIVE_PATH");
+        Log.d("MyLogs", "GOT INTENT. FILE NAME: " + fileName + " ; RELATIVE PATH: " + fileRelativePath);
+
+        mReadableFileViewModel.getReadableFileByPrimaryKey(fileName, fileRelativePath).observe(this, readableFile -> {
+            if (readableFile != null) {
+                currentChapter = readableFile.getLastOpenChapter();
+                loadCurrentChapter();
+                sourceFile = readableFile;
+            }
+        });
+
         String uriString = intent.getStringExtra("URI_STRING");
-        fileName = intent.getStringExtra("FILE_NAME");
-        fileRelativePath = intent.getStringExtra("FILE_RELATIVE_PATH");
         Uri uri = Uri.parse(uriString);
 
         ContentResolver contentResolver = getContentResolver();
@@ -159,6 +175,13 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     }
 
     private void loadCurrentChapter() {
+        Log.d("MyLogs", "Loading current chapter!");
+        if (sourceFile != null) {
+            ReadableFile readableFile = sourceFile;
+            readableFile.setLastOpenChapter(currentChapter);
+            mReadableFileViewModel.update(readableFile);
+            Log.d("MyLogs", "UPDATED THAT FILE BRAH CHAPTER: " + currentChapter);
+        }
         String dataPiece = bookData.get(currentChapter);
 
         epubViewer.loadDataWithBaseURL(null,
@@ -203,8 +226,8 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
         String prompt = selectedText.replaceAll("^\"|\"$", "");
         boolean includeFileName = sharedPreferences.getBoolean("send_file_name", false);
-        if (includeFileName) {
-            prompt = "File name: " + fileName + "; Selected text: " + prompt;
+        if (includeFileName && sourceFile != null) {
+            prompt = "File name: " + sourceFile.getFileName() + "; Selected text: " + prompt;
         }
 
         double temperature = ((double) temperaturePercentage) / 100;
@@ -218,6 +241,15 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         executor.execute(() -> {
             Log.d("MyLogs", finalPrompt);
             String response = chatGptApiService.processPrompt(finalSystemPrompt, finalPrompt, temperature);
+            String fileName;
+            String fileRelativePath;
+            if (sourceFile != null) {
+                fileName = sourceFile.getFileName();
+                fileRelativePath = sourceFile.getRelativePath();
+            } else {
+                fileRelativePath = "";
+                fileName = "";
+            }
 
             handler.post(() -> {
                 Log.d("MyLogs", "Response: " + response);

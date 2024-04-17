@@ -34,6 +34,10 @@ public class ReadableFileRepository {
 
     public LiveData<List<ReadableFile>> getRecentFiles() {return mRecentFiles;}
 
+    public LiveData<ReadableFile> getReadableFileByPrimaryKey(String fileName, String relativePath) {
+        return mReadableFileDao.getReadableFileByPrimaryKey(fileName, relativePath);
+    }
+
     public void insert(ReadableFile readableFile) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             mReadableFileDao.insertFiles(readableFile);

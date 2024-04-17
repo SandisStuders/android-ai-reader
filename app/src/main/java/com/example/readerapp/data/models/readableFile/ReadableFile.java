@@ -33,6 +33,9 @@ public class ReadableFile {
     @ColumnInfo(name = "isFavorite")
     private boolean isFavorite;
 
+    @ColumnInfo(name = "lastOpenChapter")
+    private int lastOpenChapter;
+
     public ReadableFile(@NonNull String fileName,
                         String contentUri,
                         String creationDate,
@@ -49,6 +52,7 @@ public class ReadableFile {
         this.relativePath = relativePath;
         this.mostRecentAccessTime = mostRecentAccessTime;
         this.isFavorite = isFavorite;
+        lastOpenChapter = 0;
     }
 
     @NonNull
@@ -117,18 +121,27 @@ public class ReadableFile {
         isFavorite = favorite;
     }
 
+    public int getLastOpenChapter() {
+        return lastOpenChapter;
+    }
+
+    public void setLastOpenChapter(int lastOpenChapter) {
+        this.lastOpenChapter = lastOpenChapter;
+    }
+
     @NonNull
     @Override
     public String toString() {
         return "ReadableFile{" +
-                ", name='" + fileName + '\'' +
+                "fileName='" + fileName + '\'' +
                 ", contentUri='" + contentUri + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", fileSize='" + fileSize + '\'' +
                 ", fileType='" + fileType + '\'' +
                 ", relativePath='" + relativePath + '\'' +
-                ", mostRecentAccessTime='" + mostRecentAccessTime + '\'' +
+                ", mostRecentAccessTime=" + mostRecentAccessTime +
                 ", isFavorite=" + isFavorite +
+                ", lastOpenChapter=" + lastOpenChapter +
                 '}';
     }
 

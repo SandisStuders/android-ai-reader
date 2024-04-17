@@ -14,7 +14,7 @@ import com.example.readerapp.data.models.readableFile.ReadableFileDao;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {ReadableFile.class, GptResponse.class}, version = 11)
+@Database(entities = {ReadableFile.class, GptResponse.class}, version = 12)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ReadableFileDao readableFileDao();
     public abstract GptResponseDao gptResponseDao();
@@ -30,6 +30,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "app_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
