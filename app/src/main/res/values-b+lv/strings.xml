@@ -42,6 +42,8 @@
     <string name="document_selection_alert_text_2">&#xA0;simboliem var tikt paskaidrots ar AI.</string>
 
     <!-- Settings Screen -->
+    <string name="settings_top_bar_header">Iestatījumi</string>
+
     <string name="settings_category_general">Vispārīgi</string>
     <string name="settings_category_privacy">Privātums</string>
     <string name="settings_category_personal_prompt">Personīgais prompts</string>
@@ -68,6 +70,7 @@
     <string name="settings_default_personal_prompt_name">Personīgais Prompts</string>
 
     <!-- Response History Viewer Screen -->
+    <string name="history_top_bar_header">Vēsture</string>
     <string name="response_selected_text_default">Nav izvēlētā teksta</string>
     <string name="response_ai_response_default">Nav atbildes</string>
 

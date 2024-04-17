@@ -39,6 +39,8 @@
     <string name="document_selection_alert_text_2">&#xA0;symbols can be processed by AI.</string>
 
     <!-- Settings Screen -->
+    <string name="settings_top_bar_header">Settings</string>
+
     <string name="settings_category_general">General</string>
     <string name="settings_category_privacy">Privacy</string>
     <string name="settings_category_personal_prompt">Personal prompt</string>
@@ -65,6 +67,7 @@
     <string name="settings_default_personal_prompt_name">Personal Prompt</string>
 
     <!-- Response History Viewer Screen -->
+    <string name="history_top_bar_header">History</string>
     <string name="response_selected_text_default">No selected text</string>
     <string name="response_ai_response_default">No response</string>
 
