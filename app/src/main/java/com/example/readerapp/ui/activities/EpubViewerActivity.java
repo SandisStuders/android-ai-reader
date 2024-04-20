@@ -9,16 +9,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -40,9 +37,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Spine;
+import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.epub.EpubReader;
 
 public class EpubViewerActivity extends AppCompatActivity implements ReaderView.ActionModeCallback {
@@ -51,7 +50,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     ReaderView epubViewer;
     BottomNavigationView bottomAppBar;
     int currentChapter;
-    ArrayList<String> bookData;
+    ArrayList<Chapter> chapters;
     ReadableFile sourceFile;
     private GptResponseViewModel mGptResponseViewModel;
     private ReadableFileViewModel mReadableFileViewModel;
@@ -68,7 +67,6 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
 
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
         epubViewer = binding.epubViewer;
         bottomAppBar = binding.bottomAppBar;
@@ -80,7 +78,6 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         } else {
             currentChapter = savedInstanceState.getInt("CURRENT_CHAPTER", 0);
         }
-        bookData = new ArrayList<>();
 
         epubViewer.getSettings().setJavaScriptEnabled(true);
 
@@ -90,11 +87,13 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         String fileRelativePath = intent.getStringExtra("FILE_RELATIVE_PATH");
         Log.d("MyLogs", "GOT INTENT. FILE NAME: " + fileName + " ; RELATIVE PATH: " + fileRelativePath);
 
+        AtomicReference<Boolean> firstFileObservation = new AtomicReference<>(true);
         mReadableFileViewModel.getReadableFileByPrimaryKey(fileName, fileRelativePath).observe(this, readableFile -> {
-            if (readableFile != null) {
+            if (readableFile != null && firstFileObservation.get()) {
                 currentChapter = readableFile.getLastOpenChapter();
-                loadCurrentChapter();
                 sourceFile = readableFile;
+                loadCurrentChapter("primary");
+                firstFileObservation.set(false);
             }
         });
 
@@ -106,24 +105,8 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             InputStream fileStream = contentResolver.openInputStream(uri);
             Book book = (new EpubReader()).readEpub(fileStream);
 
-            Spine spine = book.getSpine();
-
-            for(int i = 0; i < spine.size(); i++){
-                StringBuilder builder = new StringBuilder();
-                try {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(spine.getResource(i).getInputStream()));
-                    String aux = "";
-                    while ((aux = r.readLine()) != null) {
-                        builder.append(aux);
-                        builder.append('\n');
-                    }
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-                bookData.add(builder.toString());
-
-            }
-            loadCurrentChapter();
+            this.chapters = getChapterContentAndTitles(book);
+            loadCurrentChapter("onCreate content resolver");
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -133,27 +116,28 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
+                Log.d("MyLogs", "ITEM PRESSED!");
 
                 if (itemId == R.id.prevChapter) {
                     if (currentChapter > 0) {
                         currentChapter--;
-                        loadCurrentChapter();
+                        loadCurrentChapter("navigation prev chapt");
                     }
                     return true;
                 } else if (itemId == R.id.selectChapter) {
-                    String[] chapters = new String[bookData.size()];
-                    for (int i = 0; i < bookData.size(); i++) {
-                        chapters[i] = String.valueOf(i+1);
+                    String[] chapterTitles = new String[chapters.size()];
+                    for (int i = 0; i < chapters.size(); i++) {
+                        chapterTitles[i] = chapters.get(i).title;
                     }
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Select a Chapter");
 
-                    builder.setItems(chapters, new DialogInterface.OnClickListener() {
+                    builder.setItems(chapterTitles, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             currentChapter = which;
-                            loadCurrentChapter();
+                            loadCurrentChapter("navigation select chapt");
                         }
                     });
                     AlertDialog dialog = builder.create();
@@ -161,9 +145,10 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
                     return true;
                 } else if (itemId == R.id.nextChapter) {
-                    if (currentChapter < bookData.size() - 1) {
+                    Log.d("MyLogs", "Next item button pressed!");
+                    if (currentChapter < chapters.size() - 1) {
                         currentChapter++;
-                        loadCurrentChapter();
+                        loadCurrentChapter("navigation next chapt");
                     }
                     return true;
                 }
@@ -174,15 +159,85 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
     }
 
-    private void loadCurrentChapter() {
-        Log.d("MyLogs", "Loading current chapter!");
+    private ArrayList<Chapter> getChapterContentAndTitles(Book book) {
+        ArrayList<TOCReference> tocReferences = (ArrayList<TOCReference>) book.getTableOfContents().getTocReferences();
+        ArrayList<Chapter> chapters = new ArrayList<>();
+        if (tocReferences.size() > 1) {
+            chapters = getChapterContentAndTitlesViaToc(tocReferences);
+        } else {
+            Spine spine = book.getSpine();
+            chapters = getChapterContentAndTitlesViaSpine(spine);
+        }
+        return chapters;
+    }
+
+    private ArrayList<Chapter> getChapterContentAndTitlesViaToc(ArrayList<TOCReference> tocReferences) {
+        ArrayList<Chapter> chapters = new ArrayList<>();
+        for (TOCReference TocReference : tocReferences) {
+            String referenceTitle = TocReference.getTitle();
+            StringBuilder contentBuilder = new StringBuilder();
+            try {
+                InputStreamReader contentReader = new InputStreamReader(TocReference.getResource().getInputStream());
+                BufferedReader r = new BufferedReader(contentReader);
+                String aux = "";
+                while ((aux = r.readLine()) != null) {
+                    contentBuilder.append(aux);
+                    contentBuilder.append('\n');
+                }
+            }
+            catch(Exception e) {
+                Log.d("MyLogs", e.toString());
+            }
+            String referenceContent = contentBuilder.toString();
+            Chapter referenceChapter = new Chapter(referenceTitle, referenceContent);
+            chapters.add(referenceChapter);
+
+            ArrayList<TOCReference> referenceChildren = (ArrayList<TOCReference>) TocReference.getChildren();
+            if (referenceChildren.size() > 0) {
+                ArrayList<Chapter> childChapters = getChapterContentAndTitlesViaToc(referenceChildren);
+                chapters.addAll(childChapters);
+            }
+        }
+        return chapters;
+    }
+
+    private ArrayList<Chapter> getChapterContentAndTitlesViaSpine(Spine spine) {
+        ArrayList<Chapter> chapters = new ArrayList<>();
+        for (int i = 0; i < spine.size(); i++){
+            String chapterTitle = spine.getResource(i).getTitle();
+            if (chapterTitle == null) {
+                chapterTitle = String.valueOf(i);
+            }
+
+            StringBuilder contentBuilder = new StringBuilder();
+            try {
+                InputStreamReader contentReader = new InputStreamReader(spine.getResource(i).getInputStream());
+                BufferedReader r = new BufferedReader(contentReader);
+                String aux = "";
+                while ((aux = r.readLine()) != null) {
+                    contentBuilder.append(aux);
+                    contentBuilder.append('\n');
+                }
+            } catch(Exception e) {
+                Log.d("MyLogs", e.toString());
+            }
+            String chapterContent = contentBuilder.toString();
+
+            Chapter spineChapter = new Chapter(chapterTitle, chapterContent);
+            chapters.add(spineChapter);
+        }
+        return chapters;
+    }
+
+    private void loadCurrentChapter(String source) {
+        Log.d("MyLogs", "Loading current chapter! Source: " + source);
         if (sourceFile != null) {
             ReadableFile readableFile = sourceFile;
             readableFile.setLastOpenChapter(currentChapter);
             mReadableFileViewModel.update(readableFile);
             Log.d("MyLogs", "UPDATED THAT FILE BRAH CHAPTER: " + currentChapter);
         }
-        String dataPiece = bookData.get(currentChapter);
+        String dataPiece = chapters.get(currentChapter).content;
 
         epubViewer.loadDataWithBaseURL(null,
                 dataPiece,
@@ -275,5 +330,15 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("CURRENT_CHAPTER", currentChapter);
+    }
+
+    private class Chapter {
+        public String title;
+        public String content;
+
+        Chapter(String title, String content) {
+            this.title = title;
+            this.content = content;
+        }
     }
 }
