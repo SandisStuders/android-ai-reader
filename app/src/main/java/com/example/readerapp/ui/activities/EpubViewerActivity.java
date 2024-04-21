@@ -1,5 +1,6 @@
 package com.example.readerapp.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
+import android.webkit.WebSettings;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -31,18 +33,34 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.MediaType;
+import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.domain.Resources;
 import nl.siegmann.epublib.domain.Spine;
 import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.epub.EpubReader;
+import nl.siegmann.epublib.service.MediatypeService;
 
 public class EpubViewerActivity extends AppCompatActivity implements ReaderView.ActionModeCallback {
 
@@ -55,14 +73,27 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     private GptResponseViewModel mGptResponseViewModel;
     private ReadableFileViewModel mReadableFileViewModel;
     Context context;
+    private String baseUrl;
+    private String CACHE_DIR;
+
+    private final Set<MediaType> cachedFileFormats = new HashSet<>(Arrays.asList(
+            MediatypeService.CSS,
+            MediatypeService.PNG,
+            MediatypeService.GIF,
+            MediatypeService.JPG,
+            MediatypeService.SVG
+    ));
 
     private final int SELECTED_TEXT_MAX_CHARS = 600;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_viewer);
         context = this;
+
+        CACHE_DIR = context.getCacheDir() + "/temp_files";
 
         mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
@@ -79,7 +110,9 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             currentChapter = savedInstanceState.getInt("CURRENT_CHAPTER", 0);
         }
 
-        epubViewer.getSettings().setJavaScriptEnabled(true);
+        WebSettings webSettings = epubViewer.getSettings();
+        webSettings.setAllowFileAccess(true);
+        webSettings.setJavaScriptEnabled(true);
 
         Intent intent = getIntent();
 
@@ -104,6 +137,10 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         try {
             InputStream fileStream = contentResolver.openInputStream(uri);
             Book book = (new EpubReader()).readEpub(fileStream);
+
+            emptyCache();
+            downloadResources(book);
+            this.baseUrl = findBaseUrl(book);
 
             this.chapters = getChapterContentAndTitles(book);
             loadCurrentChapter("onCreate content resolver");
@@ -157,6 +194,70 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             }
         });
 
+    }
+
+    private String findBaseUrl(Book book) {
+        String baseUrl;
+
+        String oebpsDirectory = CACHE_DIR + File.separator + "OEBPS";
+        String opfSubdirectory = book.getOpfResource().getHref().replace("content.opf","").replace("/","");
+        String opfDirectory = CACHE_DIR + File.separator + opfSubdirectory;
+
+        File oebpsFile = new File(oebpsDirectory);
+        File opfFile = new File(opfDirectory);
+
+        if (oebpsFile.exists() && oebpsFile.isDirectory()) {
+            Log.d("MyLogs", "Base URL crated to OEBPS");
+            baseUrl = "file://" + oebpsDirectory + File.separator;
+        } else if(opfFile.exists() && opfFile.isDirectory() && !opfSubdirectory.equals("")){
+            Log.d("MyLogs", "Base URL crated to resource folder");
+            baseUrl = "file://" + opfDirectory + File.separator;
+        } else {
+            Log.d("MyLogs", "Base URL crated to head temp_files directory");
+            baseUrl = "file://" + CACHE_DIR + File.separator;
+        }
+        Log.d("MyLogs", "BASE URL: " + baseUrl);
+        return baseUrl;
+    }
+
+    private void downloadResources(Book book) {
+        try {
+            Resources resources = book.getResources();
+            Collection<Resource> resourceCol = resources.getAll();
+            Log.d("MyLogs", "Download files begin");
+            for (Resource resource : resourceCol) {
+                if (cachedFileFormats.contains(resource.getMediaType())) {
+                    Path path = Paths.get(CACHE_DIR, resource.getHref());
+
+                    Path parentDir = path.getParent();
+                    if (!Files.exists(parentDir)) {
+                        Files.createDirectories(parentDir);
+                    }
+
+                    Log.d("MyLogs", resource.getHref() + "\t" + path.toAbsolutePath() + "\t" + resource.getSize());
+
+                    Files.write(path, resource.getData(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+                }
+            }
+            Log.d("MyLogs", "Download files end");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            Log.e("error", Objects.requireNonNull(e.getMessage()));
+        }
+    }
+
+    private void emptyCache (){
+        if (CACHE_DIR != null) {
+            Path cachePath = Paths.get(CACHE_DIR);
+            try (Stream<Path> paths = Files.walk(cachePath)) {
+                paths.sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private ArrayList<Chapter> getChapterContentAndTitles(Book book) {
@@ -238,8 +339,11 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             Log.d("MyLogs", "UPDATED THAT FILE BRAH CHAPTER: " + currentChapter);
         }
         String dataPiece = chapters.get(currentChapter).content;
+        dataPiece = dataPiece.replaceAll("href=\"http", "hreflink=\"http").replaceAll("<a href=\"[^\"]*", "<a ").replaceAll("hreflink=\"http", "href=\"http");
 
-        epubViewer.loadDataWithBaseURL(null,
+        Log.d("MyLogs", dataPiece);
+
+        epubViewer.loadDataWithBaseURL(baseUrl,
                 dataPiece,
                 "text/html",
                 "UTF-8",
