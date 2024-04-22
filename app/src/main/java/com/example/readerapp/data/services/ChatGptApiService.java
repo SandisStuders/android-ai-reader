@@ -41,6 +41,8 @@ public class ChatGptApiService {
                     model, systemPrompt, prompt, temperature
             );
 
+            Log.d("MyPrompts", "PROMPT SENT TO API: " + body);
+
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(body);

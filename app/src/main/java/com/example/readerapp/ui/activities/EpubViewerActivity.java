@@ -376,17 +376,19 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // 'context' refers to the Activity or Context object
         int temperaturePercentage = sharedPreferences.getInt("temperature", 40);
 
-        String systemPrompt = "";
-        if (useDefaultSystemPrompt) {
-            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt because they want a bigger explanation on their selection. Interpret the text and try to provide factual knowledge surrounding it, avoid speculations and uncertainties if possible. Try to keep your response encompassing but concise, 100-200 tokens, if possible.";
-        } else {
-            systemPrompt = sharedPreferences.getString("personal_prompt_define", "defaultDefinition");
-        }
-
         String prompt = selectedText.replaceAll("^\"|\"$", "");
         boolean includeFileName = sharedPreferences.getBoolean("send_file_name", false);
         if (includeFileName && sourceFile != null) {
             prompt = "File name: " + sourceFile.getFileName() + "; Selected text: " + prompt;
+        }
+
+        String systemPrompt = "";
+        if (useDefaultSystemPrompt) {
+            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt because they want an explanation on their selection. Interpret the text and try to provide factual knowledge surrounding it, avoid speculations and uncertainties if possible. If the text includes only one term, provide definition for it. Prompt may include the filename as additional context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
+        } else {
+            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt. Their prompt also includes more specific instructions on what they'd like to receive in the response. Prompt may include the filename as additional context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
+            String userInstructions = sharedPreferences.getString("personal_prompt_define", "");
+            prompt = prompt + "; User's instructions: " + userInstructions;
         }
 
         double temperature = ((double) temperaturePercentage) / 100;
