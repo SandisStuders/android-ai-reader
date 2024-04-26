@@ -43,16 +43,14 @@ import java.util.Set;
 public class FileViewerFragment extends Fragment implements FilesRecyclerViewAdapter.FileOptionListener {
 
     private FragmentFileViewerBinding binding;
-
     private RecyclerView filesRecyclerView;
     private BottomNavigationView bottomFileListSelectionBar;
     private FilesRecyclerViewAdapter adapter;
-
     private ReadableFileViewModel mReadableFileViewModel;
+
     private ArrayList<ReadableFile> favoriteFileDetails = new ArrayList<>();
     private ArrayList<ReadableFile> allFileDetails = new ArrayList<>();
     private ArrayList<ReadableFile> recentFileDetails = new ArrayList<>();
-
     private String currentListType;
 
     @Override
@@ -62,9 +60,14 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         filesRecyclerView = binding.filesRecyclerView;
         bottomFileListSelectionBar = binding.bottomFileSelectionBar;
 
+        adapter = new FilesRecyclerViewAdapter(this);
+        filesRecyclerView.setAdapter(adapter);
+        filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
 
-        ArrayList<ReadableFile> fileDetails = getEpubFileList();
+        // to the viewmodel
+        ArrayList<ReadableFile> fileDetails = mReadableFileViewModel.getEpubFileList();
         mReadableFileViewModel.insert(fileDetails);
 
         if (savedInstanceState == null) {
@@ -73,9 +76,8 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             currentListType = savedInstanceState.getString("CURRENT_LIST_TYPE", "RECENT");
         }
 
-        adapter = new FilesRecyclerViewAdapter(this);
-        adapter.setCurrentListType(currentListType);
 
+        adapter.setCurrentListType(currentListType);
         if (Objects.equals(currentListType, "RECENT")) {
             adapter.setReadableFileDetails(recentFileDetails);
         } else if (Objects.equals(currentListType, "FAVORITE")) {
@@ -83,9 +85,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         } else if (Objects.equals(currentListType, "ALL")) {
             adapter.setReadableFileDetails(allFileDetails);
         }
-
-        filesRecyclerView.setAdapter(adapter);
-        filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        // to the view model
 
         bottomFileListSelectionBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -129,7 +129,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             @Override
             public void onChanged(List<ReadableFile> readableFiles) {
                 if (readableFiles != null) {
-                    ArrayList<ReadableFile> filesOnDevice = getEpubFileList();
+                    ArrayList<ReadableFile> filesOnDevice = mReadableFileViewModel.getEpubFileList();
                     allFileDetails = (ArrayList<ReadableFile>) readableFiles;
 
                     Set<String> deviceFilePaths = new HashSet<>();
@@ -169,12 +169,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             }
         });
 
-        if (savedInstanceState != null) {
-            Log.d("MyLogs", "Fragment saved instance state in onCreate is not null");
-            String listType = savedInstanceState.getString("CURRENT_LIST_TYPE", "RECENT");
-            Log.d("MyLogs", "GOT LIST TYPE: " + listType);
-        }
-
         return binding.getRoot();
     }
 
@@ -184,61 +178,10 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         binding = null;
     }
 
-    private ArrayList<ReadableFile> getEpubFileList() {
-        ArrayList<ReadableFile> epubFiles = new ArrayList<>();
-
-        String[] projection = new String[]{
-                MediaStore.Files.FileColumns._ID,
-                MediaStore.Files.FileColumns.DISPLAY_NAME,
-                MediaStore.Files.FileColumns.DATE_ADDED,
-                MediaStore.Files.FileColumns.SIZE,
-                MediaStore.Files.FileColumns.RELATIVE_PATH,
-                MediaStore.Files.FileColumns.MIME_TYPE
-        };
-
-        // Filter for EPUB MIME type
-        String selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-        String[] selectionArgs = new String[]{"application/epub+zip"};
-
-        // Query URI for external files content
-        Uri queryUri = MediaStore.Files.getContentUri("external");
-
-        try (Cursor cursor = getContext().getContentResolver().query(queryUri, projection, selection, selectionArgs, null)) {
-            if (cursor != null && cursor.moveToFirst()) {
-                String[] colNames = cursor.getColumnNames();
-
-                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
-                int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
-                int creationDateColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED);
-                int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE);
-                int relativePathColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.RELATIVE_PATH);
-
-                do {
-                    long id = cursor.getLong(idColumn);
-                    String name = cursor.getString(nameColumn);
-                    Uri contentUri = ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), id);
-                    String timestamp = cursor.getString(creationDateColumn);
-                    String creationDate = HelperFunctions.timestampToDate(timestamp, "dd-MM-yyyy HH:mm");
-                    String size = cursor.getString(sizeColumn);
-                    String adjustedFileSize = HelperFunctions.adjustByteSizeString(size);
-                    String relativePath = cursor.getString(relativePathColumn);
-
-                    ReadableFile fileDetails = new ReadableFile(name,
-                            contentUri.toString(),
-                            creationDate,
-                            adjustedFileSize,
-                            "EPUB",
-                            relativePath,
-                            0,
-                            false);
-                    epubFiles.add(fileDetails);
-                } while (cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return epubFiles;
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("CURRENT_LIST_TYPE", currentListType);
     }
 
     @Override
@@ -262,7 +205,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
     @Override
     public void fileOpened(ReadableFile readableFile, View v) {
         Uri contentUri = Uri.parse(readableFile.getContentUri());
-        if (!fileExists(contentUri, v.getContext())) {
+        if (!mReadableFileViewModel.fileExists(contentUri)) {
             return;
         }
 
@@ -280,33 +223,5 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         intent.putExtra("FILE_NAME", fileName);
         intent.putExtra("FILE_RELATIVE_PATH", fileRelativePath);
         context.startActivity(intent);
-    }
-
-    public String getCurrentListType() {
-        return currentListType;
-    }
-
-    private boolean fileExists(Uri uri, Context context) {
-        boolean exists = false;
-        if(null != uri) {
-            try {
-                InputStream inputStream = context.getContentResolver().openInputStream(uri);
-                inputStream.close();
-                exists = true;
-            } catch (Exception e) {
-                Log.d("MyLogs", "File corresponding to the uri does not exist " + uri.toString());
-            }
-        }
-        return exists;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        // Make sure to call the super method so that the states of our views are saved
-        super.onSaveInstanceState(outState);
-        outState.putString("CURRENT_LIST_TYPE", currentListType);
-        // Save our own state now
-        Log.d("MyLogs", "Fragment onSaveInstanceState gets called");
-        Log.d("MyLogs", "PUT LIST TYPE: " + currentListType);
     }
 }

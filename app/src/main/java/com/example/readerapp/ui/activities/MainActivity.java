@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d("MyLogs", "onCreate method with savedInstanceState bundle");
         }
-
+        
         appToolbar = binding.appToolbar;
         setSupportActionBar(appToolbar);
 
