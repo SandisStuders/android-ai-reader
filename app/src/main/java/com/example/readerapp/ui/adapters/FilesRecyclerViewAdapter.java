@@ -22,7 +22,7 @@ import java.util.Objects;
 public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<ReadableFile> readableFileDetails = new ArrayList<>();
-    private FileOptionListener listener;
+    private final FileOptionListener listener;
 
 
     public FilesRecyclerViewAdapter(FileOptionListener listener) {
@@ -123,12 +123,12 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView textFileName, textFileType, textFileCreationDate, textFileSize,
+        private final TextView textFileName, textFileType, textFileCreationDate, textFileSize,
                 textFileRelativePath;
 
-        private ImageView thumbnail;
+        private final ImageView thumbnail;
 
-        private CardView fileCard;
+        private final CardView fileCard;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

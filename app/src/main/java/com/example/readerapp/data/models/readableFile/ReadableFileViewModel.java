@@ -10,10 +10,8 @@ import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
-import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
 import com.example.readerapp.utils.HelperFunctions;
 
 import java.io.InputStream;
@@ -25,63 +23,52 @@ import java.util.Set;
 
 public class ReadableFileViewModel extends AndroidViewModel {
 
-    private ReadableFileRepository mRepository;
+    private final ReadableFileRepository mRepository;
+    private LiveData<List<ReadableFile>> mAllReadableFiles;
+    private LiveData<List<ReadableFile>> mFavoriteFiles;
+    private LiveData<List<ReadableFile>> mRecentFiles;
+    private final Context context;
 
-    private final LiveData<List<ReadableFile>> mAllReadableFiles;
-    private final LiveData<List<ReadableFile>> mFavoriteFiles;
-    private final LiveData<List<ReadableFile>> mRecentFiles;
-    private Context context;
-    private MutableLiveData<UiState> uiState =
-            new MutableLiveData<UiState>(new UiState(null));
+    private LiveData<List<ReadableFile>> activeList;
+    private Observer<List<ReadableFile>> activeObserver;
+    private String activeListType;
 
     public ReadableFileViewModel (Application application) {
         super(application);
         mRepository = new ReadableFileRepository(application);
-        mAllReadableFiles = mRepository.getAllReadableFiles();
-        mFavoriteFiles = mRepository.getFavoriteFiles();
-        mRecentFiles = mRepository.getRecentFiles();
         context = application.getApplicationContext();
     }
 
-    public void initialize(String currentListType) {
+    public void loadData() {
+        mAllReadableFiles = mRepository.getAllReadableFiles();
+        mFavoriteFiles = mRepository.getFavoriteFiles();
+        mRecentFiles = mRepository.getRecentFiles();
+    }
+
+    public void initialize(String currentListType, Observer<List<ReadableFile>> newObserver) {
+        loadData();
+        changeListType(currentListType, newObserver);
         refreshDatabaseWithStorageData();
+    }
 
-        LiveData<List<ReadableFile>> initialReadableFiles = null;
-        if (Objects.equals(currentListType, "RECENT")) {
-            initialReadableFiles = mRecentFiles;
-        } else if (Objects.equals(currentListType, "FAVORITE")) {
-            initialReadableFiles = mFavoriteFiles;
-        } else if (Objects.equals(currentListType, "ALL")) {
-            initialReadableFiles = mAllReadableFiles;
+    public void changeListType(String newListType, Observer<List<ReadableFile>> newObserver) {
+        if (activeList != null && activeObserver != null) {
+            activeList.removeObserver(activeObserver);
         }
-        setUiState(new UiState(initialReadableFiles));
-    }
 
-    public LiveData<UiState> getUiState() {
-        return uiState;
-    }
-
-    private void setUiState(UiState uiState) {
-        this.uiState = new MutableLiveData<>(uiState);
-    }
-
-    private void refreshDatabaseWithStorageData() {
-        ArrayList<ReadableFile> storageFiles = getEpubFileList();
-        ArrayList<ReadableFile> filesToDelete = findFilesToDelete(storageFiles);
-        if (filesToDelete != null) {
-            mRepository.deleteFiles(filesToDelete);
-        }
-        insert(storageFiles);
-    }
-
-    public void changeListType(String newListType) {
         if (Objects.equals(newListType, "RECENT")) {
-            setUiState(new UiState(mRecentFiles));
+            activeList = mRecentFiles;
         } else if (Objects.equals(newListType, "FAVORITE")) {
-            setUiState(new UiState(mFavoriteFiles));
+            activeList = mFavoriteFiles;
         } else if (Objects.equals(newListType, "ALL")) {
-            setUiState(new UiState(mAllReadableFiles));
+            activeList = mAllReadableFiles;
         }
+
+        activeObserver = newObserver;
+        if (activeList != null) {
+            activeList.observeForever(activeObserver);
+        }
+        activeListType = newListType;
     }
 
     public void addToFavorites(ReadableFile readableFile) {
@@ -99,11 +86,27 @@ public class ReadableFileViewModel extends AndroidViewModel {
         update(readableFile);
     }
 
-    public LiveData<List<ReadableFile>> getAllReadableFiles() { return mAllReadableFiles; }
+    public boolean prepareFileOpen(ReadableFile readableFile) {
+        if (!fileExists(readableFile)) {
+            return false;
+        }
 
-    public LiveData<List<ReadableFile>> getFavoriteFiles() { return mFavoriteFiles; }
+        long currentTimeMillis = System.currentTimeMillis();
+        readableFile.setMostRecentAccessTime(currentTimeMillis);
+        update(readableFile);
 
-    public LiveData<List<ReadableFile>> getRecentFiles() { return mRecentFiles; }
+        return true;
+    }
+
+    private void refreshDatabaseWithStorageData() {
+        ArrayList<ReadableFile> storageFiles = getEpubFileList();
+
+        ArrayList<ReadableFile> filesToDelete = findFilesToDelete(storageFiles);
+        deleteFiles(filesToDelete);
+
+        insert(storageFiles);
+    }
+
     public LiveData<ReadableFile> getReadableFileByPrimaryKey(String fileName, String relativePath) {
         return mRepository.getReadableFileByPrimaryKey(fileName, relativePath);
     }
@@ -114,13 +117,14 @@ public class ReadableFileViewModel extends AndroidViewModel {
 
     public void update(ReadableFile readableFile) {
         mRepository.update(readableFile);
+        Log.d("MyPrompts", "ViewModel: Update: Repository Updated");
     }
 
     public void deleteFiles(ArrayList<ReadableFile> readableFiles) {
         mRepository.deleteFiles(readableFiles);
     }
 
-    public ArrayList<ReadableFile> getEpubFileList() {
+    private ArrayList<ReadableFile> getEpubFileList() {
         ArrayList<ReadableFile> epubFiles = new ArrayList<>();
 
         String[] projection = new String[]{
@@ -177,8 +181,11 @@ public class ReadableFileViewModel extends AndroidViewModel {
         return epubFiles;
     }
 
-    public ArrayList<ReadableFile> findFilesToDelete(ArrayList<ReadableFile> storageFiles) {
-        ArrayList<ReadableFile> databaseFiles = (ArrayList<ReadableFile>) mAllReadableFiles.getValue();
+    private ArrayList<ReadableFile> findFilesToDelete(ArrayList<ReadableFile> storageFiles) {
+        ArrayList<ReadableFile> databaseFiles = new ArrayList<>();
+        if (mAllReadableFiles != null) {
+            databaseFiles = (ArrayList<ReadableFile>) mAllReadableFiles.getValue();
+        }
         if (databaseFiles == null) {
             return new ArrayList<>();
         }
@@ -203,7 +210,7 @@ public class ReadableFileViewModel extends AndroidViewModel {
         return filesToDelete;
     }
 
-    public boolean fileExists(ReadableFile readableFile) {
+    private boolean fileExists(ReadableFile readableFile) {
         Uri uri = Uri.parse(readableFile.getContentUri());
         boolean exists = false;
         if(uri != null) {
@@ -218,33 +225,11 @@ public class ReadableFileViewModel extends AndroidViewModel {
         return exists;
     }
 
-    public boolean prepareFileOpen(ReadableFile readableFile) {
-        if (!fileExists(readableFile)) {
-            return false;
-        }
-
-        long currentTimeMillis = System.currentTimeMillis();
-        readableFile.setMostRecentAccessTime(currentTimeMillis);
-        update(readableFile);
-
-        return true;
+    public String getActiveListType() {
+        return activeListType;
     }
 
-    public class UiState {
-        private LiveData<List<ReadableFile>> currentReadableFileList;
-        private String currentListType;
-
-        public UiState(LiveData<List<ReadableFile>> currentReadableFileList) {
-            this.currentReadableFileList = currentReadableFileList;
-        }
-
-        public LiveData<List<ReadableFile>> getCurrentReadableFileList() {
-            return currentReadableFileList;
-        }
-
-        public void setCurrentReadableFileList(LiveData<List<ReadableFile>> readableFiles) {
-            this.currentReadableFileList = readableFiles;
-        }
+    private void setActiveListType(String activeListType) {
+        this.activeListType = activeListType;
     }
-
 }
