@@ -10,6 +10,7 @@ import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
@@ -17,7 +18,10 @@ import com.example.readerapp.utils.HelperFunctions;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class ReadableFileViewModel extends AndroidViewModel {
 
@@ -27,6 +31,8 @@ public class ReadableFileViewModel extends AndroidViewModel {
     private final LiveData<List<ReadableFile>> mFavoriteFiles;
     private final LiveData<List<ReadableFile>> mRecentFiles;
     private Context context;
+    private MutableLiveData<UiState> uiState =
+            new MutableLiveData<UiState>(new UiState(null));
 
     public ReadableFileViewModel (Application application) {
         super(application);
@@ -35,6 +41,62 @@ public class ReadableFileViewModel extends AndroidViewModel {
         mFavoriteFiles = mRepository.getFavoriteFiles();
         mRecentFiles = mRepository.getRecentFiles();
         context = application.getApplicationContext();
+    }
+
+    public void initialize(String currentListType) {
+        refreshDatabaseWithStorageData();
+
+        LiveData<List<ReadableFile>> initialReadableFiles = null;
+        if (Objects.equals(currentListType, "RECENT")) {
+            initialReadableFiles = mRecentFiles;
+        } else if (Objects.equals(currentListType, "FAVORITE")) {
+            initialReadableFiles = mFavoriteFiles;
+        } else if (Objects.equals(currentListType, "ALL")) {
+            initialReadableFiles = mAllReadableFiles;
+        }
+        setUiState(new UiState(initialReadableFiles));
+    }
+
+    public LiveData<UiState> getUiState() {
+        return uiState;
+    }
+
+    private void setUiState(UiState uiState) {
+        this.uiState = new MutableLiveData<>(uiState);
+    }
+
+    private void refreshDatabaseWithStorageData() {
+        ArrayList<ReadableFile> storageFiles = getEpubFileList();
+        ArrayList<ReadableFile> filesToDelete = findFilesToDelete(storageFiles);
+        if (filesToDelete != null) {
+            mRepository.deleteFiles(filesToDelete);
+        }
+        insert(storageFiles);
+    }
+
+    public void changeListType(String newListType) {
+        if (Objects.equals(newListType, "RECENT")) {
+            setUiState(new UiState(mRecentFiles));
+        } else if (Objects.equals(newListType, "FAVORITE")) {
+            setUiState(new UiState(mFavoriteFiles));
+        } else if (Objects.equals(newListType, "ALL")) {
+            setUiState(new UiState(mAllReadableFiles));
+        }
+    }
+
+    public void addToFavorites(ReadableFile readableFile) {
+        readableFile.setFavorite(true);
+        update(readableFile);
+    }
+
+    public void removeFromFavorites(ReadableFile readableFile) {
+        readableFile.setFavorite(false);
+        update(readableFile);
+    }
+
+    public void removeRecentTime(ReadableFile readableFile) {
+        readableFile.setMostRecentAccessTime(0);
+        update(readableFile);
     }
 
     public LiveData<List<ReadableFile>> getAllReadableFiles() { return mAllReadableFiles; }
@@ -115,9 +177,36 @@ public class ReadableFileViewModel extends AndroidViewModel {
         return epubFiles;
     }
 
-    public boolean fileExists(Uri uri) {
+    public ArrayList<ReadableFile> findFilesToDelete(ArrayList<ReadableFile> storageFiles) {
+        ArrayList<ReadableFile> databaseFiles = (ArrayList<ReadableFile>) mAllReadableFiles.getValue();
+        if (databaseFiles == null) {
+            return new ArrayList<>();
+        }
+        if (storageFiles == null) {
+            return databaseFiles;
+        }
+
+        Set<String> deviceFilePaths = new HashSet<>();
+        for (ReadableFile file : storageFiles) {
+            String fileFullPath = file.getRelativePath() + file.getFileName();
+            deviceFilePaths.add(fileFullPath);
+        }
+
+        ArrayList<ReadableFile> filesToDelete = new ArrayList<>();
+        for (ReadableFile dbFile : databaseFiles) {
+            String fileFullPath = dbFile.getRelativePath() + dbFile.getFileName();
+            if (!deviceFilePaths.contains(fileFullPath)) {
+                filesToDelete.add(dbFile);
+            }
+        }
+
+        return filesToDelete;
+    }
+
+    public boolean fileExists(ReadableFile readableFile) {
+        Uri uri = Uri.parse(readableFile.getContentUri());
         boolean exists = false;
-        if(null != uri) {
+        if(uri != null) {
             try {
                 InputStream inputStream = context.getContentResolver().openInputStream(uri);
                 inputStream.close();
@@ -127,6 +216,35 @@ public class ReadableFileViewModel extends AndroidViewModel {
             }
         }
         return exists;
+    }
+
+    public boolean prepareFileOpen(ReadableFile readableFile) {
+        if (!fileExists(readableFile)) {
+            return false;
+        }
+
+        long currentTimeMillis = System.currentTimeMillis();
+        readableFile.setMostRecentAccessTime(currentTimeMillis);
+        update(readableFile);
+
+        return true;
+    }
+
+    public class UiState {
+        private LiveData<List<ReadableFile>> currentReadableFileList;
+        private String currentListType;
+
+        public UiState(LiveData<List<ReadableFile>> currentReadableFileList) {
+            this.currentReadableFileList = currentReadableFileList;
+        }
+
+        public LiveData<List<ReadableFile>> getCurrentReadableFileList() {
+            return currentReadableFileList;
+        }
+
+        public void setCurrentReadableFileList(LiveData<List<ReadableFile>> readableFiles) {
+            this.currentReadableFileList = readableFiles;
+        }
     }
 
 }

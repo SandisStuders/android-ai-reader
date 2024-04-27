@@ -22,7 +22,6 @@ import java.util.Objects;
 public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<ReadableFile> readableFileDetails = new ArrayList<>();
-    private String currentListType = "RECENT";
     private FileOptionListener listener;
 
 
@@ -74,6 +73,7 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
 
                 PopupMenu popup = new PopupMenu(v.getContext(), v);
 
+                String currentListType = listener.itemLongClick();
                 if (Objects.equals(currentListType, "RECENT")) {
                     popup.inflate(R.menu.item_files_list_long_click_menu_recent);
                 } else if (Objects.equals(currentListType, "FAVORITE")) {
@@ -147,18 +147,11 @@ public class FilesRecyclerViewAdapter extends RecyclerView.Adapter<FilesRecycler
         notifyDataSetChanged();
     }
 
-    public String getCurrentListType() {
-        return currentListType;
-    }
-
-    public void setCurrentListType(String currentListType) {
-        this.currentListType = currentListType;
-    }
-
     public interface FileOptionListener {
         void addToFavorites(ReadableFile readableFile);
         void removeFromRecent(ReadableFile readableFile);
         void removeFromFavorites(ReadableFile readableFile);
         void fileOpened(ReadableFile readableFile, View v);
+        String itemLongClick();
     }
 }

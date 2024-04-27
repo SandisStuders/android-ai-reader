@@ -48,9 +48,9 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
     private FilesRecyclerViewAdapter adapter;
     private ReadableFileViewModel mReadableFileViewModel;
 
-    private ArrayList<ReadableFile> favoriteFileDetails = new ArrayList<>();
-    private ArrayList<ReadableFile> allFileDetails = new ArrayList<>();
-    private ArrayList<ReadableFile> recentFileDetails = new ArrayList<>();
+//    private ArrayList<ReadableFile> favoriteFileDetails = new ArrayList<>();
+//    private ArrayList<ReadableFile> allFileDetails = new ArrayList<>();
+//    private ArrayList<ReadableFile> recentFileDetails = new ArrayList<>();
     private String currentListType;
 
     @Override
@@ -65,26 +65,36 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
         filesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
+        if (savedInstanceState == null) {
+            mReadableFileViewModel.initialize("RECENT");
+        } else {
+            String savedListType = savedInstanceState.getString("CURRENT_LIST_TYPE", "RECENT");
+            mReadableFileViewModel.initialize(savedListType);
+        }
+
+        mReadableFileViewModel.getUiState().observe(getViewLifecycleOwner(), uiState -> {
+            ArrayList<ReadableFile> initialReadableFileList = (ArrayList<ReadableFile>) uiState.getCurrentReadableFileList().getValue();
+            adapter.setReadableFileDetails(initialReadableFileList);
+            uiState.getCurrentReadableFileList().observe(getViewLifecycleOwner(), readableFiles -> {
+                adapter.setReadableFileDetails((ArrayList<ReadableFile>) readableFiles);
+            });
+        });
 
         // to the viewmodel
-        ArrayList<ReadableFile> fileDetails = mReadableFileViewModel.getEpubFileList();
-        mReadableFileViewModel.insert(fileDetails);
-
-        if (savedInstanceState == null) {
-            currentListType = "RECENT";
-        } else {
-            currentListType = savedInstanceState.getString("CURRENT_LIST_TYPE", "RECENT");
-        }
+//        ArrayList<ReadableFile> fileDetails = mReadableFileViewModel.getEpubFileList();
+//        mReadableFileViewModel.insert(fileDetails);
 
 
-        adapter.setCurrentListType(currentListType);
-        if (Objects.equals(currentListType, "RECENT")) {
-            adapter.setReadableFileDetails(recentFileDetails);
-        } else if (Objects.equals(currentListType, "FAVORITE")) {
-            adapter.setReadableFileDetails(favoriteFileDetails);
-        } else if (Objects.equals(currentListType, "ALL")) {
-            adapter.setReadableFileDetails(allFileDetails);
-        }
+
+
+//        adapter.setCurrentListType(currentListType);
+//        if (Objects.equals(currentListType, "RECENT")) {
+//            adapter.setReadableFileDetails(recentFileDetails);
+//        } else if (Objects.equals(currentListType, "FAVORITE")) {
+//            adapter.setReadableFileDetails(favoriteFileDetails);
+//        } else if (Objects.equals(currentListType, "ALL")) {
+//            adapter.setReadableFileDetails(allFileDetails);
+//        }
         // to the view model
 
         bottomFileListSelectionBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -93,19 +103,22 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.recentFiles) {
+                    mReadableFileViewModel.changeListType("RECENT");
                     currentListType = "RECENT";
-                    adapter.setCurrentListType(currentListType);
-                    adapter.setReadableFileDetails(recentFileDetails);
+//                    adapter.setCurrentListType(currentListType);
+//                    adapter.setReadableFileDetails(recentFileDetails);
                     return true;
                 } else if (itemId == R.id.favoriteFiles) {
+                    mReadableFileViewModel.changeListType("FAVORITE");
                     currentListType = "FAVORITE";
-                    adapter.setCurrentListType(currentListType);
-                    adapter.setReadableFileDetails(favoriteFileDetails);
+//                    adapter.setCurrentListType(currentListType);
+//                    adapter.setReadableFileDetails(favoriteFileDetails);
                     return true;
                 } else if (itemId == R.id.allFiles) {
+                    mReadableFileViewModel.changeListType("ALL");
                     currentListType = "ALL";
-                    adapter.setCurrentListType(currentListType);
-                    adapter.setReadableFileDetails(allFileDetails);
+//                    adapter.setCurrentListType(currentListType);
+//                    adapter.setReadableFileDetails(allFileDetails);
                     return true;
                 }
 
@@ -113,61 +126,61 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             }
         });
 
-        mReadableFileViewModel.getFavoriteFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
-            @Override
-            public void onChanged(List<ReadableFile> readableFiles) {
-                if (readableFiles != null) {
-                    favoriteFileDetails = (ArrayList<ReadableFile>) readableFiles;
-                    if (Objects.equals(currentListType, "FAVORITE")) {
-                        adapter.setReadableFileDetails(favoriteFileDetails);
-                    }
-                }
-            }
-        });
-
-        mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
-            @Override
-            public void onChanged(List<ReadableFile> readableFiles) {
-                if (readableFiles != null) {
-                    ArrayList<ReadableFile> filesOnDevice = mReadableFileViewModel.getEpubFileList();
-                    allFileDetails = (ArrayList<ReadableFile>) readableFiles;
-
-                    Set<String> deviceFilePaths = new HashSet<>();
-                    for (ReadableFile file : filesOnDevice) {
-                        String fileFullPath = file.getRelativePath() + file.getFileName();
-                        deviceFilePaths.add(fileFullPath);
-                    }
-
-                    ArrayList<ReadableFile> filesToDelete = new ArrayList<>();
-                    for (ReadableFile dbFile : readableFiles) {
-                        String fileFullPath = dbFile.getRelativePath() + dbFile.getFileName();
-                        if (!deviceFilePaths.contains(fileFullPath)) {
-                            filesToDelete.add(dbFile);
-                        }
-                    }
-
-                    if (!filesToDelete.isEmpty()) {
-                        mReadableFileViewModel.deleteFiles(filesToDelete);
-                    }
-
-                    if (Objects.equals(currentListType, "ALL")) {
-                        adapter.setReadableFileDetails(allFileDetails);
-                    }
-                }
-            }
-        });
-
-        mReadableFileViewModel.getRecentFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
-            @Override
-            public void onChanged(List<ReadableFile> readableFiles) {
-                if (readableFiles != null) {
-                    recentFileDetails = (ArrayList<ReadableFile>) readableFiles;
-                    if (Objects.equals(currentListType, "RECENT")) {
-                        adapter.setReadableFileDetails(recentFileDetails);
-                    }
-                }
-            }
-        });
+//        mReadableFileViewModel.getFavoriteFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
+//            @Override
+//            public void onChanged(List<ReadableFile> readableFiles) {
+//                if (readableFiles != null) {
+//                    favoriteFileDetails = (ArrayList<ReadableFile>) readableFiles;
+//                    if (Objects.equals(currentListType, "FAVORITE")) {
+//                        adapter.setReadableFileDetails(favoriteFileDetails);
+//                    }
+//                }
+//            }
+//        });
+//
+//        mReadableFileViewModel.getAllReadableFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
+//            @Override
+//            public void onChanged(List<ReadableFile> readableFiles) {
+//                if (readableFiles != null) {
+//                    ArrayList<ReadableFile> filesOnDevice = mReadableFileViewModel.getEpubFileList();
+//                    allFileDetails = (ArrayList<ReadableFile>) readableFiles;
+//
+//                    Set<String> deviceFilePaths = new HashSet<>();
+//                    for (ReadableFile file : filesOnDevice) {
+//                        String fileFullPath = file.getRelativePath() + file.getFileName();
+//                        deviceFilePaths.add(fileFullPath);
+//                    }
+//
+//                    ArrayList<ReadableFile> filesToDelete = new ArrayList<>();
+//                    for (ReadableFile dbFile : readableFiles) {
+//                        String fileFullPath = dbFile.getRelativePath() + dbFile.getFileName();
+//                        if (!deviceFilePaths.contains(fileFullPath)) {
+//                            filesToDelete.add(dbFile);
+//                        }
+//                    }
+//
+//                    if (!filesToDelete.isEmpty()) {
+//                        mReadableFileViewModel.deleteFiles(filesToDelete);
+//                    }
+//
+//                    if (Objects.equals(currentListType, "ALL")) {
+//                        adapter.setReadableFileDetails(allFileDetails);
+//                    }
+//                }
+//            }
+//        });
+//
+//        mReadableFileViewModel.getRecentFiles().observe(getViewLifecycleOwner(), new Observer<List<ReadableFile>>() {
+//            @Override
+//            public void onChanged(List<ReadableFile> readableFiles) {
+//                if (readableFiles != null) {
+//                    recentFileDetails = (ArrayList<ReadableFile>) readableFiles;
+//                    if (Objects.equals(currentListType, "RECENT")) {
+//                        adapter.setReadableFileDetails(recentFileDetails);
+//                    }
+//                }
+//            }
+//        });
 
         return binding.getRoot();
     }
@@ -186,42 +199,35 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     @Override
     public void addToFavorites(ReadableFile readableFile) {
-        readableFile.setFavorite(true);
-        mReadableFileViewModel.update(readableFile);
+        mReadableFileViewModel.addToFavorites(readableFile);
     }
 
     @Override
     public void removeFromFavorites(ReadableFile readableFile) {
-        readableFile.setFavorite(false);
-        mReadableFileViewModel.update(readableFile);
+        mReadableFileViewModel.removeFromFavorites(readableFile);
     }
 
     @Override
     public void removeFromRecent(ReadableFile readableFile) {
-        readableFile.setMostRecentAccessTime(0);
-        mReadableFileViewModel.update(readableFile);
+        mReadableFileViewModel.removeRecentTime(readableFile);
     }
 
     @Override
     public void fileOpened(ReadableFile readableFile, View v) {
-        Uri contentUri = Uri.parse(readableFile.getContentUri());
-        if (!mReadableFileViewModel.fileExists(contentUri)) {
+        if (!mReadableFileViewModel.prepareFileOpen(readableFile)) {
             return;
         }
 
-        long currentTimeMillis = System.currentTimeMillis();
-        readableFile.setMostRecentAccessTime(currentTimeMillis);
-        mReadableFileViewModel.update(readableFile);
-
         Context context = v.getContext();
-        String uriString = readableFile.getContentUri();
-        String fileName = readableFile.getFileName();
-        String fileRelativePath = readableFile.getRelativePath();
-
         Intent intent = new Intent(context, EpubViewerActivity.class);
-        intent.putExtra("URI_STRING", uriString);
-        intent.putExtra("FILE_NAME", fileName);
-        intent.putExtra("FILE_RELATIVE_PATH", fileRelativePath);
+        intent.putExtra("URI_STRING", readableFile.getContentUri());
+        intent.putExtra("FILE_NAME", readableFile.getFileName());
+        intent.putExtra("FILE_RELATIVE_PATH", readableFile.getRelativePath());
         context.startActivity(intent);
+    }
+
+    @Override
+    public String itemLongClick() {
+        return currentListType;
     }
 }
