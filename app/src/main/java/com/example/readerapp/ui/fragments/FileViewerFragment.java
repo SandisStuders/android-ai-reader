@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileViewModel;
+import com.example.readerapp.ui.viewModels.FileViewerViewModel;
 import com.example.readerapp.databinding.FragmentFileViewerBinding;
 import com.example.readerapp.ui.activities.EpubViewerActivity;
 import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;
@@ -35,7 +35,7 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
     private RecyclerView filesRecyclerView;
     private BottomNavigationView bottomFileListSelectionBar;
     private FilesRecyclerViewAdapter adapter;
-    private ReadableFileViewModel mReadableFileViewModel;
+    private FileViewerViewModel mFileViewerViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,12 +55,12 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
             }
         };
 
-        mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
+        mFileViewerViewModel = new ViewModelProvider(this).get(FileViewerViewModel.class);
         if (savedInstanceState == null) {
-            mReadableFileViewModel.initialize("RECENT", observer);
+            mFileViewerViewModel.initialize("RECENT", observer);
         } else {
             String savedListType = savedInstanceState.getString("CURRENT_LIST_TYPE", "RECENT");
-            mReadableFileViewModel.initialize(savedListType, observer);
+            mFileViewerViewModel.initialize(savedListType, observer);
         }
 
         bottomFileListSelectionBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -69,14 +69,14 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.recentFiles) {
-                    mReadableFileViewModel.changeListType("RECENT", observer);
+                    mFileViewerViewModel.changeListType("RECENT", observer);
                     return true;
                 } else if (itemId == R.id.favoriteFiles) {
-                    mReadableFileViewModel.changeListType("FAVORITE", observer);
+                    mFileViewerViewModel.changeListType("FAVORITE", observer);
                     return true;
                 } else if (itemId == R.id.allFiles) {
                     Log.d("MyLogs", "Navigated to All files list");
-                    mReadableFileViewModel.changeListType("ALL", observer);
+                    mFileViewerViewModel.changeListType("ALL", observer);
                     return true;
                 }
 
@@ -96,28 +96,28 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        String currentListType = Objects.requireNonNull(mReadableFileViewModel.getActiveListType());
+        String currentListType = Objects.requireNonNull(mFileViewerViewModel.getActiveListType());
         outState.putString("CURRENT_LIST_TYPE", currentListType);
     }
 
     @Override
     public void addToFavorites(ReadableFile readableFile) {
-        mReadableFileViewModel.addToFavorites(readableFile);
+        mFileViewerViewModel.addToFavorites(readableFile);
     }
 
     @Override
     public void removeFromFavorites(ReadableFile readableFile) {
-        mReadableFileViewModel.removeFromFavorites(readableFile);
+        mFileViewerViewModel.removeFromFavorites(readableFile);
     }
 
     @Override
     public void removeFromRecent(ReadableFile readableFile) {
-        mReadableFileViewModel.removeRecentTime(readableFile);
+        mFileViewerViewModel.removeRecentTime(readableFile);
     }
 
     @Override
     public void fileOpened(ReadableFile readableFile, View v) {
-        if (!mReadableFileViewModel.prepareFileOpen(readableFile)) {
+        if (!mFileViewerViewModel.prepareFileOpen(readableFile)) {
             return;
         }
 
@@ -131,6 +131,6 @@ public class FileViewerFragment extends Fragment implements FilesRecyclerViewAda
 
     @Override
     public String itemLongClick() {
-        return mReadableFileViewModel.getActiveListType();
+        return mFileViewerViewModel.getActiveListType();
     }
 }

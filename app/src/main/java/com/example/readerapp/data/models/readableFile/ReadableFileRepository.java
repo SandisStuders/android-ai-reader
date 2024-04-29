@@ -18,7 +18,7 @@ public class ReadableFileRepository {
     private LiveData<List<ReadableFile>> mFavoriteFiles;
     private LiveData<List<ReadableFile>> mRecentFiles;
 
-    ReadableFileRepository(Application application) {
+    public ReadableFileRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mReadableFileDao = db.readableFileDao();
         mAllReadableFiles = mReadableFileDao.getAllFiles();

@@ -25,7 +25,7 @@ import com.example.readerapp.R;
 import com.example.readerapp.data.models.gptResponse.GptResponse;
 import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileViewModel;
+import com.example.readerapp.ui.viewModels.FileViewerViewModel;
 import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.example.readerapp.ui.customViews.ReaderView;
@@ -71,7 +71,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     ArrayList<Chapter> chapters;
     ReadableFile sourceFile;
     private GptResponseViewModel mGptResponseViewModel;
-    private ReadableFileViewModel mReadableFileViewModel;
+    private FileViewerViewModel mFileViewerViewModel;
     Context context;
     private String baseUrl;
     private String CACHE_DIR;
@@ -96,7 +96,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         CACHE_DIR = context.getCacheDir() + "/temp_files";
 
         mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
-        mReadableFileViewModel = new ViewModelProvider(this).get(ReadableFileViewModel.class);
+        mFileViewerViewModel = new ViewModelProvider(this).get(FileViewerViewModel.class);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
         epubViewer = binding.epubViewer;
@@ -121,7 +121,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         Log.d("MyLogs", "GOT INTENT. FILE NAME: " + fileName + " ; RELATIVE PATH: " + fileRelativePath);
 
         AtomicReference<Boolean> firstFileObservation = new AtomicReference<>(true);
-        mReadableFileViewModel.getReadableFileByPrimaryKey(fileName, fileRelativePath).observe(this, readableFile -> {
+        mFileViewerViewModel.getReadableFileByPrimaryKey(fileName, fileRelativePath).observe(this, readableFile -> {
             if (readableFile != null && firstFileObservation.get()) {
                 currentChapter = readableFile.getLastOpenChapter();
                 sourceFile = readableFile;
@@ -335,7 +335,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         if (sourceFile != null) {
             ReadableFile readableFile = sourceFile;
             readableFile.setLastOpenChapter(currentChapter);
-            mReadableFileViewModel.update(readableFile);
+            mFileViewerViewModel.update(readableFile);
             Log.d("MyLogs", "UPDATED THAT FILE BRAH CHAPTER: " + currentChapter);
         }
         String dataPiece = chapters.get(currentChapter).content;

@@ -15,15 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.readerapp.R;
 import com.example.readerapp.data.models.gptResponse.GptResponse;
 import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileViewModel;
 import com.example.readerapp.databinding.ActivityResponseHistoryViewerBinding;
-import com.example.readerapp.ui.adapters.FilesRecyclerViewAdapter;
 import com.example.readerapp.ui.adapters.ResponsesRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ResponseHistoryViewerActivity extends AppCompatActivity implements ResponsesRecyclerViewAdapter.ResponseOptionListener {
 
