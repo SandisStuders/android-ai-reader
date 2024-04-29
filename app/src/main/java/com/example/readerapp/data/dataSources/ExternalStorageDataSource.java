@@ -5,10 +5,12 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.utils.HelperFunctions;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ExternalStorageDataSource {
@@ -61,6 +63,20 @@ public class ExternalStorageDataSource {
         }
 
         return readableFiles;
+    }
+
+    public boolean fileExists(Uri fileUri) {
+        boolean exists = false;
+        if(fileUri != null) {
+            try {
+                InputStream inputStream = contentResolver.openInputStream(fileUri);
+                inputStream.close();
+                exists = true;
+            } catch (Exception e) {
+                Log.d("MyLogs", "File corresponding to the uri does not exist " + fileUri.toString());
+            }
+        }
+        return exists;
     }
 
 }

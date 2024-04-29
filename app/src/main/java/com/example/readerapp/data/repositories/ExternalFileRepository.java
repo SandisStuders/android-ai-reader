@@ -1,18 +1,23 @@
 package com.example.readerapp.data.repositories;
 
 import android.app.Application;
+import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.example.readerapp.data.dataSources.ExternalStorageDataSource;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ExternalFileRepository {
 
     private final ExternalStorageDataSource externalStorageDataSource;
+    private final Application application;
 
     public ExternalFileRepository(Application application) {
+        this.application = application;
         this.externalStorageDataSource = new ExternalStorageDataSource(application.getContentResolver());
     }
 
@@ -36,6 +41,11 @@ public class ExternalFileRepository {
         }
 
         return readableFiles;
+    }
+
+    public boolean fileExists(ReadableFile readableFile) {
+        Uri uri = Uri.parse(readableFile.getContentUri());
+        return externalStorageDataSource.fileExists(uri);
     }
 
 }
