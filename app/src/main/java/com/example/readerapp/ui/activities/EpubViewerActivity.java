@@ -25,64 +25,36 @@ import com.example.readerapp.R;
 import com.example.readerapp.data.models.gptResponse.GptResponse;
 import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.ui.viewModels.FileViewerViewModel;
 import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.example.readerapp.ui.customViews.ReaderView;
+import com.example.readerapp.ui.viewModels.EpubViewerViewModel;
+import com.example.readerapp.ui.viewModels.FileViewerViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
 
 import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.MediaType;
-import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.domain.Resources;
-import nl.siegmann.epublib.domain.Spine;
-import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.epub.EpubReader;
-import nl.siegmann.epublib.service.MediatypeService;
 
 public class EpubViewerActivity extends AppCompatActivity implements ReaderView.ActionModeCallback {
+
+    private EpubViewerViewModel epubViewerViewModel;
 
     ActivityEpubViewerBinding binding;
     ReaderView epubViewer;
     BottomNavigationView bottomAppBar;
     int currentChapter;
-    ArrayList<Chapter> chapters;
     ReadableFile sourceFile;
     private GptResponseViewModel mGptResponseViewModel;
     private FileViewerViewModel mFileViewerViewModel;
     Context context;
     private String baseUrl;
-    private String CACHE_DIR;
-
-    private final Set<MediaType> cachedFileFormats = new HashSet<>(Arrays.asList(
-            MediatypeService.CSS,
-            MediatypeService.PNG,
-            MediatypeService.GIF,
-            MediatypeService.JPG,
-            MediatypeService.SVG
-    ));
 
     private final int SELECTED_TEXT_MAX_CHARS = 600;
 
@@ -93,16 +65,14 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         setContentView(R.layout.activity_epub_viewer);
         context = this;
 
-        CACHE_DIR = context.getCacheDir() + "/temp_files";
-
-        mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
-        mFileViewerViewModel = new ViewModelProvider(this).get(FileViewerViewModel.class);
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
         epubViewer = binding.epubViewer;
         bottomAppBar = binding.bottomAppBar;
 
         epubViewer.setActionModeCallback(this);
+        WebSettings webSettings = epubViewer.getSettings();
+        webSettings.setAllowFileAccess(true);
+        webSettings.setJavaScriptEnabled(true);
 
         if (savedInstanceState == null) {
             currentChapter = 0;
@@ -110,15 +80,15 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             currentChapter = savedInstanceState.getInt("CURRENT_CHAPTER", 0);
         }
 
-        WebSettings webSettings = epubViewer.getSettings();
-        webSettings.setAllowFileAccess(true);
-        webSettings.setJavaScriptEnabled(true);
-
         Intent intent = getIntent();
-
         String fileName = intent.getStringExtra("FILE_NAME");
         String fileRelativePath = intent.getStringExtra("FILE_RELATIVE_PATH");
-        Log.d("MyLogs", "GOT INTENT. FILE NAME: " + fileName + " ; RELATIVE PATH: " + fileRelativePath);
+
+        mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
+        mFileViewerViewModel = new ViewModelProvider(this).get(FileViewerViewModel.class);
+        epubViewerViewModel = new ViewModelProvider(this).get(EpubViewerViewModel.class);
+
+        //  -----------
 
         AtomicReference<Boolean> firstFileObservation = new AtomicReference<>(true);
         mFileViewerViewModel.getReadableFileByPrimaryKey(fileName, fileRelativePath).observe(this, readableFile -> {
@@ -138,16 +108,20 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             InputStream fileStream = contentResolver.openInputStream(uri);
             Book book = (new EpubReader()).readEpub(fileStream);
 
-            emptyCache();
-            downloadResources(book);
-            this.baseUrl = findBaseUrl(book);
+            epubViewerViewModel.emptyCache();
+            epubViewerViewModel.downloadResources(book);
 
-            this.chapters = getChapterContentAndTitles(book);
+            this.baseUrl = epubViewerViewModel.findBaseUrl(book);
+
+            epubViewerViewModel.setChapters(epubViewerViewModel.getChapterContentAndTitles(book));
+
             loadCurrentChapter("onCreate content resolver");
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // ----------
 
         bottomAppBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -162,10 +136,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                     }
                     return true;
                 } else if (itemId == R.id.selectChapter) {
-                    String[] chapterTitles = new String[chapters.size()];
-                    for (int i = 0; i < chapters.size(); i++) {
-                        chapterTitles[i] = chapters.get(i).title;
-                    }
+                    String[] chapterTitles = epubViewerViewModel.getChapterTitles();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Select a Chapter");
@@ -183,7 +154,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                     return true;
                 } else if (itemId == R.id.nextChapter) {
                     Log.d("MyLogs", "Next item button pressed!");
-                    if (currentChapter < chapters.size() - 1) {
+                    if (currentChapter < epubViewerViewModel.getChapterAmount() - 1) {
                         currentChapter++;
                         loadCurrentChapter("navigation next chapt");
                     }
@@ -196,140 +167,6 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
     }
 
-    private String findBaseUrl(Book book) {
-        String baseUrl;
-
-        String oebpsDirectory = CACHE_DIR + File.separator + "OEBPS";
-        String opfSubdirectory = book.getOpfResource().getHref().replace("content.opf","").replace("/","");
-        String opfDirectory = CACHE_DIR + File.separator + opfSubdirectory;
-
-        File oebpsFile = new File(oebpsDirectory);
-        File opfFile = new File(opfDirectory);
-
-        if (oebpsFile.exists() && oebpsFile.isDirectory()) {
-            Log.d("MyLogs", "Base URL crated to OEBPS");
-            baseUrl = "file://" + oebpsDirectory + File.separator;
-        } else if(opfFile.exists() && opfFile.isDirectory() && !opfSubdirectory.equals("")){
-            Log.d("MyLogs", "Base URL crated to resource folder");
-            baseUrl = "file://" + opfDirectory + File.separator;
-        } else {
-            Log.d("MyLogs", "Base URL crated to head temp_files directory");
-            baseUrl = "file://" + CACHE_DIR + File.separator;
-        }
-        Log.d("MyLogs", "BASE URL: " + baseUrl);
-        return baseUrl;
-    }
-
-    private void downloadResources(Book book) {
-        try {
-            Resources resources = book.getResources();
-            Collection<Resource> resourceCol = resources.getAll();
-            Log.d("MyLogs", "Download files begin");
-            for (Resource resource : resourceCol) {
-                if (cachedFileFormats.contains(resource.getMediaType())) {
-                    Path path = Paths.get(CACHE_DIR, resource.getHref());
-
-                    Path parentDir = path.getParent();
-                    if (!Files.exists(parentDir)) {
-                        Files.createDirectories(parentDir);
-                    }
-
-                    Log.d("MyLogs", resource.getHref() + "\t" + path.toAbsolutePath() + "\t" + resource.getSize());
-
-                    Files.write(path, resource.getData(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-                }
-            }
-            Log.d("MyLogs", "Download files end");
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            Log.e("error", Objects.requireNonNull(e.getMessage()));
-        }
-    }
-
-    private void emptyCache (){
-        if (CACHE_DIR != null) {
-            Path cachePath = Paths.get(CACHE_DIR);
-            try (Stream<Path> paths = Files.walk(cachePath)) {
-                paths.sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private ArrayList<Chapter> getChapterContentAndTitles(Book book) {
-        ArrayList<TOCReference> tocReferences = (ArrayList<TOCReference>) book.getTableOfContents().getTocReferences();
-        ArrayList<Chapter> chapters = new ArrayList<>();
-        if (tocReferences.size() > 1) {
-            chapters = getChapterContentAndTitlesViaToc(tocReferences);
-        } else {
-            Spine spine = book.getSpine();
-            chapters = getChapterContentAndTitlesViaSpine(spine);
-        }
-        return chapters;
-    }
-
-    private ArrayList<Chapter> getChapterContentAndTitlesViaToc(ArrayList<TOCReference> tocReferences) {
-        ArrayList<Chapter> chapters = new ArrayList<>();
-        for (TOCReference TocReference : tocReferences) {
-            String referenceTitle = TocReference.getTitle();
-            StringBuilder contentBuilder = new StringBuilder();
-            try {
-                InputStreamReader contentReader = new InputStreamReader(TocReference.getResource().getInputStream());
-                BufferedReader r = new BufferedReader(contentReader);
-                String aux = "";
-                while ((aux = r.readLine()) != null) {
-                    contentBuilder.append(aux);
-                    contentBuilder.append('\n');
-                }
-            }
-            catch(Exception e) {
-                Log.d("MyLogs", e.toString());
-            }
-            String referenceContent = contentBuilder.toString();
-            Chapter referenceChapter = new Chapter(referenceTitle, referenceContent);
-            chapters.add(referenceChapter);
-
-            ArrayList<TOCReference> referenceChildren = (ArrayList<TOCReference>) TocReference.getChildren();
-            if (referenceChildren.size() > 0) {
-                ArrayList<Chapter> childChapters = getChapterContentAndTitlesViaToc(referenceChildren);
-                chapters.addAll(childChapters);
-            }
-        }
-        return chapters;
-    }
-
-    private ArrayList<Chapter> getChapterContentAndTitlesViaSpine(Spine spine) {
-        ArrayList<Chapter> chapters = new ArrayList<>();
-        for (int i = 0; i < spine.size(); i++){
-            String chapterTitle = spine.getResource(i).getTitle();
-            if (chapterTitle == null) {
-                chapterTitle = String.valueOf(i);
-            }
-
-            StringBuilder contentBuilder = new StringBuilder();
-            try {
-                InputStreamReader contentReader = new InputStreamReader(spine.getResource(i).getInputStream());
-                BufferedReader r = new BufferedReader(contentReader);
-                String aux = "";
-                while ((aux = r.readLine()) != null) {
-                    contentBuilder.append(aux);
-                    contentBuilder.append('\n');
-                }
-            } catch(Exception e) {
-                Log.d("MyLogs", e.toString());
-            }
-            String chapterContent = contentBuilder.toString();
-
-            Chapter spineChapter = new Chapter(chapterTitle, chapterContent);
-            chapters.add(spineChapter);
-        }
-        return chapters;
-    }
-
     private void loadCurrentChapter(String source) {
         Log.d("MyLogs", "Loading current chapter! Source: " + source);
         if (sourceFile != null) {
@@ -338,7 +175,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             mFileViewerViewModel.update(readableFile);
             Log.d("MyLogs", "UPDATED THAT FILE BRAH CHAPTER: " + currentChapter);
         }
-        String dataPiece = chapters.get(currentChapter).content;
+        String dataPiece = epubViewerViewModel.getChapterContent(currentChapter);
         dataPiece = dataPiece.replaceAll("href=\"http", "hreflink=\"http").replaceAll("<a href=\"[^\"]*", "<a ").replaceAll("hreflink=\"http", "href=\"http");
 
         Log.d("MyLogs", dataPiece);
@@ -352,24 +189,8 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
     @Override
     public void onTextSelected(String selectedText, boolean useDefaultSystemPrompt) {
-        if (selectedText.length() > SELECTED_TEXT_MAX_CHARS) {
-            String alertTitle = getString(R.string.document_selection_alert_title);
-            String alertText1 = getString(R.string.document_selection_alert_text_1);
-            String alertText2 = getString(R.string.document_selection_alert_text_2);
-            String alertButtonOk = getString(R.string.alert_button_ok);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(alertText1 + SELECTED_TEXT_MAX_CHARS + alertText2)
-                    .setTitle(alertTitle);
-
-            builder.setPositiveButton(alertButtonOk, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-
-                }
-            });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
+        if (epubViewerViewModel.selectedTextTooLong(selectedText)) {
+            showTextTooLongAlert();
             return;
         }
 
@@ -422,29 +243,38 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                         currentChapter);
                 mGptResponseViewModel.insert(gptResponse);
 
-                Context context = this;
-                Intent intent = new Intent(context, ResponseViewerActivity.class);
+                Intent intent = new Intent(this, ResponseViewerActivity.class);
                 intent.putExtra("SELECTION", selectedText);
                 intent.putExtra("RESPONSE", response);
                 intent.putExtra("FILENAME", fileName);
-                context.startActivity(intent);
+                this.startActivity(intent);
             });
         });
+    }
+
+    public void showTextTooLongAlert() {
+        String alertTitle = getString(R.string.document_selection_alert_title);
+        String alertText1 = getString(R.string.document_selection_alert_text_1);
+        String alertText2 = getString(R.string.document_selection_alert_text_2);
+        String alertButtonOk = getString(R.string.alert_button_ok);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(alertText1 + epubViewerViewModel.getSelectedTextMaxChars() + alertText2)
+                .setTitle(alertTitle);
+
+        builder.setPositiveButton(alertButtonOk, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("CURRENT_CHAPTER", currentChapter);
-    }
-
-    private class Chapter {
-        public String title;
-        public String content;
-
-        Chapter(String title, String content) {
-            this.title = title;
-            this.content = content;
-        }
     }
 }
