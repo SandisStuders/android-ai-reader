@@ -3,9 +3,14 @@ package com.example.readerapp.data.models.aiResponse;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-@Entity(tableName = "aiResponses", primaryKeys = {"readableFileName", "readableFileRelativePath", "readableFileSourceChapter", "selectedText"})
+@Entity(tableName = "aiResponses")
 public class AiResponse {
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    private long id;
 
     @NonNull
     @ColumnInfo(name = "readableFileName")
@@ -35,6 +40,14 @@ public class AiResponse {
         this.selectedText = selectedText;
         this.response = response;
         this.readableFileSourceChapter = readableFileSourceChapter;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @NonNull

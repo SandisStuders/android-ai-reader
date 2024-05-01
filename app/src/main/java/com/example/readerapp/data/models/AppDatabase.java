@@ -14,7 +14,7 @@ import com.example.readerapp.data.models.readableFile.ReadableFileDao;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {ReadableFile.class, AiResponse.class}, version = 14)
+@Database(entities = {ReadableFile.class, AiResponse.class}, version = 15)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract ReadableFileDao readableFileDao();
     public abstract AiResponseDao gptResponseDao();
