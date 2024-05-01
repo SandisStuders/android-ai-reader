@@ -49,21 +49,14 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     ActivityEpubViewerBinding binding;
     ReaderView epubViewer;
     BottomNavigationView bottomAppBar;
-    int currentChapter;
-    ReadableFile sourceFile;
-    private GptResponseViewModel mGptResponseViewModel;
-    private FileViewerViewModel mFileViewerViewModel;
-    Context context;
-    private String baseUrl;
 
-    private final int SELECTED_TEXT_MAX_CHARS = 600;
+    private String baseUrl;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_viewer);
-        context = this;
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_epub_viewer);
         epubViewer = binding.epubViewer;
@@ -74,54 +67,23 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         webSettings.setAllowFileAccess(true);
         webSettings.setJavaScriptEnabled(true);
 
-        if (savedInstanceState == null) {
-            currentChapter = 0;
-        } else {
-            currentChapter = savedInstanceState.getInt("CURRENT_CHAPTER", 0);
-        }
-
         Intent intent = getIntent();
         String fileName = intent.getStringExtra("FILE_NAME");
         String fileRelativePath = intent.getStringExtra("FILE_RELATIVE_PATH");
 
-        mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
-        mFileViewerViewModel = new ViewModelProvider(this).get(FileViewerViewModel.class);
         epubViewerViewModel = new ViewModelProvider(this).get(EpubViewerViewModel.class);
 
-        //  -----------
-
         AtomicReference<Boolean> firstFileObservation = new AtomicReference<>(true);
-        mFileViewerViewModel.getReadableFileByPrimaryKey(fileName, fileRelativePath).observe(this, readableFile -> {
+        epubViewerViewModel.getSourceFileByPrimaryKey(fileName, fileRelativePath).observe(this, readableFile -> {
             if (readableFile != null && firstFileObservation.get()) {
-                currentChapter = readableFile.getLastOpenChapter();
-                sourceFile = readableFile;
-                loadCurrentChapter("primary");
+                epubViewerViewModel.initializeSourceFile(readableFile);
+                loadCurrentChapter();
                 firstFileObservation.set(false);
             }
         });
 
         String uriString = intent.getStringExtra("URI_STRING");
-        Uri uri = Uri.parse(uriString);
-
-        ContentResolver contentResolver = getContentResolver();
-        try {
-            InputStream fileStream = contentResolver.openInputStream(uri);
-            Book book = (new EpubReader()).readEpub(fileStream);
-
-            epubViewerViewModel.emptyCache();
-            epubViewerViewModel.downloadResources(book);
-
-            this.baseUrl = epubViewerViewModel.findBaseUrl(book);
-
-            epubViewerViewModel.setChapters(epubViewerViewModel.getChapterContentAndTitles(book));
-
-            loadCurrentChapter("onCreate content resolver");
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        // ----------
+        this.baseUrl = epubViewerViewModel.getBookAndReturnBaseUrl(uriString);
 
         bottomAppBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -131,7 +93,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                 if (itemId == R.id.prevChapter) {
                     epubViewerViewModel.decreaseChapter();
                     if (epubViewerViewModel.chapterChanged()) {
-                        loadCurrentChapter("navigation prev chapt");
+                        loadCurrentChapter();
                     }
                     return true;
                 } else if (itemId == R.id.selectChapter) {
@@ -141,7 +103,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                 } else if (itemId == R.id.nextChapter) {
                     epubViewerViewModel.increaseChapter();
                     if (epubViewerViewModel.chapterChanged()) {
-                        loadCurrentChapter("navigation next chapt");
+                        loadCurrentChapter();
                     }
                     return true;
                 }
@@ -152,21 +114,11 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
 
     }
 
-    private void loadCurrentChapter(String source) {
-        Log.d("MyLogs", "Loading current chapter! Source: " + source);
-        if (sourceFile != null) {
-            ReadableFile readableFile = sourceFile;
-            readableFile.setLastOpenChapter(currentChapter);
-            mFileViewerViewModel.update(readableFile);
-            Log.d("MyLogs", "UPDATED THAT FILE BRAH CHAPTER: " + currentChapter);
-        }
-        String dataPiece = epubViewerViewModel.getChapterContent(currentChapter);
-        dataPiece = dataPiece.replaceAll("href=\"http", "hreflink=\"http").replaceAll("<a href=\"[^\"]*", "<a ").replaceAll("hreflink=\"http", "href=\"http");
-
-        Log.d("MyLogs", dataPiece);
+    private void loadCurrentChapter() {
+        String chapterContent = epubViewerViewModel.getCurrentChapterContent();
 
         epubViewer.loadDataWithBaseURL(baseUrl,
-                dataPiece,
+                chapterContent,
                 "text/html",
                 "UTF-8",
                 null);
@@ -179,62 +131,18 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             return;
         }
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this); // 'context' refers to the Activity or Context object
-        int temperaturePercentage = sharedPreferences.getInt("temperature", 40);
-
-        String prompt = selectedText.replaceAll("^\"|\"$", "");
-        boolean includeFileName = sharedPreferences.getBoolean("send_file_name", false);
-        if (includeFileName && sourceFile != null) {
-            prompt = "File name: " + sourceFile.getFileName() + "; Selected text: " + prompt;
+        String response = "";
+        try {
+            response = epubViewerViewModel.obtainAiResponse(selectedText, useDefaultSystemPrompt).get();
+        } catch(Exception e) {
+            e.printStackTrace();
         }
 
-        String systemPrompt = "";
-        if (useDefaultSystemPrompt) {
-            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt because they want an explanation on their selection. Interpret the text and try to provide factual knowledge surrounding it, avoid speculations and uncertainties if possible. If the text includes only one term, provide definition for it. Prompt may include the filename as additional context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
-        } else {
-            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt. Their prompt also includes more specific instructions on what they'd like to receive in the response. Prompt may include the filename as additional context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
-            String userInstructions = sharedPreferences.getString("personal_prompt_define", "");
-            prompt = prompt + "; User's instructions: " + userInstructions;
-        }
-
-        double temperature = ((double) temperaturePercentage) / 100;
-
-        ChatGptApiService chatGptApiService = new ChatGptApiService();
-
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-        String finalSystemPrompt = systemPrompt;
-        String finalPrompt = prompt;
-        executor.execute(() -> {
-            Log.d("MyLogs", finalPrompt);
-            String response = chatGptApiService.processPrompt(finalSystemPrompt, finalPrompt, temperature);
-            String fileName;
-            String fileRelativePath;
-            if (sourceFile != null) {
-                fileName = sourceFile.getFileName();
-                fileRelativePath = sourceFile.getRelativePath();
-            } else {
-                fileRelativePath = "";
-                fileName = "";
-            }
-
-            handler.post(() -> {
-                Log.d("MyLogs", "Response: " + response);
-
-                AiResponse aiResponse = new AiResponse(fileName,
-                        fileRelativePath,
-                        selectedText,
-                        response,
-                        currentChapter);
-                mGptResponseViewModel.insert(aiResponse);
-
-                Intent intent = new Intent(this, ResponseViewerActivity.class);
-                intent.putExtra("SELECTION", selectedText);
-                intent.putExtra("RESPONSE", response);
-                intent.putExtra("FILENAME", fileName);
-                this.startActivity(intent);
-            });
-        });
+        Intent intent = new Intent(this, ResponseViewerActivity.class);
+        intent.putExtra("SELECTION", selectedText);
+        intent.putExtra("RESPONSE", response);
+        intent.putExtra("FILENAME", epubViewerViewModel.getSourceFileName());
+        this.startActivity(intent);
     }
 
     public void showTextTooLongAlert() {
@@ -258,14 +166,14 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     }
 
     public void showChapterList(String[] chapterTitles) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select a Chapter");
 
         builder.setItems(chapterTitles, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 epubViewerViewModel.setCurrentChapter(which);
-                loadCurrentChapter("navigation select chapt");
+                loadCurrentChapter();
             }
         });
         AlertDialog dialog = builder.create();
@@ -275,6 +183,5 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("CURRENT_CHAPTER", currentChapter);
     }
 }

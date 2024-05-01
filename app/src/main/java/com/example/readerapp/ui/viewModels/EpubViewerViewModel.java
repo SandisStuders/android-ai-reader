@@ -2,18 +2,26 @@ package com.example.readerapp.ui.viewModels;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.preference.PreferenceManager;
 
+import com.example.readerapp.data.models.aiResponse.AiResponse;
+import com.example.readerapp.data.models.aiResponse.AiResponseRepository;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
-import com.example.readerapp.data.repositories.ExternalFileRepository;
-import com.example.readerapp.ui.activities.EpubViewerActivity;
+import com.example.readerapp.data.services.ChatGptApiService;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +34,10 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import nl.siegmann.epublib.domain.Book;
@@ -34,6 +46,7 @@ import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.Resources;
 import nl.siegmann.epublib.domain.Spine;
 import nl.siegmann.epublib.domain.TOCReference;
+import nl.siegmann.epublib.epub.EpubReader;
 import nl.siegmann.epublib.service.MediatypeService;
 
 public class EpubViewerViewModel extends AndroidViewModel {
@@ -53,11 +66,18 @@ public class EpubViewerViewModel extends AndroidViewModel {
     ArrayList<Chapter> chapters = new ArrayList<>();
     int currentChapter = 0;
     boolean chapterChanged = false;
+    Application application;
+    ReadableFile sourceFile;
+    ReadableFileRepository readableFileRepository;
+    AiResponseRepository aiResponseRepository;
 
     public EpubViewerViewModel(Application application) {
         super(application);
         context = application.getApplicationContext();
         CACHE_DIR = context.getCacheDir() + "/temp_files";
+        this.application = application;
+        readableFileRepository = new ReadableFileRepository(application);
+        aiResponseRepository = new AiResponseRepository(application);
     }
 
     public String findBaseUrl(Book book) {
@@ -263,4 +283,114 @@ public class EpubViewerViewModel extends AndroidViewModel {
         return chapterChanged;
     }
 
+    public String getBookAndReturnBaseUrl(String uriString) {
+        try {
+            Uri uri = Uri.parse(uriString);
+            InputStream fileStream = application.getContentResolver().openInputStream(uri);
+            Book book = (new EpubReader()).readEpub(fileStream);
+
+            emptyCache();
+            downloadResources(book);
+
+            String baseUrl = findBaseUrl(book);
+
+            setChapters(getChapterContentAndTitles(book));
+
+            return baseUrl;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getCurrentChapterContent() {
+        if (sourceFile != null) {
+            sourceFile.setLastOpenChapter(currentChapter);
+            readableFileRepository.update(sourceFile);
+        }
+        String dataPiece = getChapterContent(currentChapter);
+        dataPiece = dataPiece.replaceAll("href=\"http", "hreflink=\"http").replaceAll("<a href=\"[^\"]*", "<a ").replaceAll("hreflink=\"http", "href=\"http");
+
+        return dataPiece;
+    }
+
+    public void setSourceFile(ReadableFile sourceFile) {
+        this.sourceFile = sourceFile;
+    }
+
+    public CompletableFuture<String> obtainAiResponse(String selectedText, boolean useDefaultSystemPrompt) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application.getApplicationContext()); // 'context' refers to the Activity or Context object
+        int temperaturePercentage = sharedPreferences.getInt("temperature", 40);
+
+        String prompt = selectedText.replaceAll("^\"|\"$", "");
+        boolean includeFileName = sharedPreferences.getBoolean("send_file_name", false);
+        if (includeFileName && sourceFile != null) {
+            prompt = "File name: " + sourceFile.getFileName() + "; Selected text: " + prompt;
+        }
+
+        String systemPrompt = "";
+        if (useDefaultSystemPrompt) {
+            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt because they want an explanation on their selection. Interpret the text and try to provide factual knowledge surrounding it, avoid speculations and uncertainties if possible. If the text includes only one term, provide definition for it. Prompt may include the filename as additional context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
+        } else {
+            systemPrompt = "You are an AI assistant integrated into a mobile reading application. The user has selected certain text from the document they are reading and sent to you as a prompt. Their prompt also includes more specific instructions on what they'd like to receive in the response. Prompt may include the filename as additional context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
+            String userInstructions = sharedPreferences.getString("personal_prompt_define", "");
+            prompt = prompt + "; User's instructions: " + userInstructions;
+        }
+
+        double temperature = ((double) temperaturePercentage) / 100;
+
+        ChatGptApiService chatGptApiService = new ChatGptApiService();
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        String finalSystemPrompt = systemPrompt;
+        String finalPrompt = prompt;
+        CompletableFuture<String> returnableResponse = new CompletableFuture<>();
+        executor.execute(() -> {
+            Log.d("MyLogs", finalPrompt);
+            String response = chatGptApiService.processPrompt(finalSystemPrompt, finalPrompt, temperature);
+            returnableResponse.complete(response);
+            String fileName;
+            String fileRelativePath;
+            if (sourceFile != null) {
+                fileName = sourceFile.getFileName();
+                fileRelativePath = sourceFile.getRelativePath();
+            } else {
+                fileRelativePath = "";
+                fileName = "";
+            }
+
+            handler.post(() -> {
+                Log.d("MyLogs", "Response: " + response);
+
+                AiResponse aiResponse = new AiResponse(fileName,
+                        fileRelativePath,
+                        selectedText,
+                        response,
+                        currentChapter);
+                aiResponseRepository.insert(aiResponse);
+
+
+            });
+        });
+
+        return returnableResponse;
+    }
+
+    public String getSourceFileName() {
+        if (sourceFile != null) {
+            return sourceFile.getFileName();
+        } else {
+            return "";
+        }
+    }
+
+    public LiveData<ReadableFile> getSourceFileByPrimaryKey(String fileName, String fileRelativePath) {
+        return readableFileRepository.getReadableFileByPrimaryKey(fileName, fileRelativePath);
+    }
+
+    public void initializeSourceFile(ReadableFile readableFile) {
+        this.sourceFile = readableFile;
+        this.currentChapter = readableFile.getLastOpenChapter();
+    }
 }

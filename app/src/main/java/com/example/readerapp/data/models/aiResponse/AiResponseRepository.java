@@ -14,7 +14,7 @@ public class AiResponseRepository {
     private AiResponseDao mAiResponseDao;
     private LiveData<List<AiResponse>> mAllGptResponses;
 
-    AiResponseRepository(Application application) {
+    public AiResponseRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mAiResponseDao = db.gptResponseDao();
         mAllGptResponses = mAiResponseDao.getAllGptResponses();
