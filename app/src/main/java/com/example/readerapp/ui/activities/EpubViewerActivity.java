@@ -127,35 +127,20 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
-                Log.d("MyLogs", "ITEM PRESSED!");
 
                 if (itemId == R.id.prevChapter) {
-                    if (currentChapter > 0) {
-                        currentChapter--;
+                    epubViewerViewModel.decreaseChapter();
+                    if (epubViewerViewModel.chapterChanged()) {
                         loadCurrentChapter("navigation prev chapt");
                     }
                     return true;
                 } else if (itemId == R.id.selectChapter) {
                     String[] chapterTitles = epubViewerViewModel.getChapterTitles();
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("Select a Chapter");
-
-                    builder.setItems(chapterTitles, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            currentChapter = which;
-                            loadCurrentChapter("navigation select chapt");
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
+                    showChapterList(chapterTitles);
                     return true;
                 } else if (itemId == R.id.nextChapter) {
-                    Log.d("MyLogs", "Next item button pressed!");
-                    if (currentChapter < epubViewerViewModel.getChapterAmount() - 1) {
-                        currentChapter++;
+                    epubViewerViewModel.increaseChapter();
+                    if (epubViewerViewModel.chapterChanged()) {
                         loadCurrentChapter("navigation next chapt");
                     }
                     return true;
@@ -268,6 +253,21 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             }
         });
 
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void showChapterList(String[] chapterTitles) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Select a Chapter");
+
+        builder.setItems(chapterTitles, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                epubViewerViewModel.setCurrentChapter(which);
+                loadCurrentChapter("navigation select chapt");
+            }
+        });
         AlertDialog dialog = builder.create();
         dialog.show();
     }

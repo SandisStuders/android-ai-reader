@@ -51,6 +51,8 @@ public class EpubViewerViewModel extends AndroidViewModel {
 
     private final int SELECTED_TEXT_MAX_CHARS = 600;
     ArrayList<Chapter> chapters = new ArrayList<>();
+    int currentChapter = 0;
+    boolean chapterChanged = false;
 
     public EpubViewerViewModel(Application application) {
         super(application);
@@ -228,6 +230,37 @@ public class EpubViewerViewModel extends AndroidViewModel {
 
     public int getSelectedTextMaxChars() {
         return SELECTED_TEXT_MAX_CHARS;
+    }
+
+    public void decreaseChapter() {
+        if (currentChapter > 0) {
+            currentChapter--;
+            chapterChanged = true;
+        } else {
+            chapterChanged = false;
+        }
+    }
+
+    public void increaseChapter() {
+        if (currentChapter < getChapterAmount() - 1) {
+            currentChapter++;
+            chapterChanged = true;
+        } else {
+            chapterChanged = false;
+        }
+    }
+
+    public void setCurrentChapter(int currentChapter) {
+        if (currentChapter >= 0 && currentChapter < getChapterAmount()) {
+            this.currentChapter = currentChapter;
+            chapterChanged = true;
+        } else {
+            chapterChanged = false;
+        }
+    }
+
+    public boolean chapterChanged() {
+        return chapterChanged;
     }
 
 }
