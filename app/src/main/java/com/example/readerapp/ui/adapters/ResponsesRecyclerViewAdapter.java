@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,15 +12,13 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.gptResponse.GptResponse;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.aiResponse.AiResponse;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class ResponsesRecyclerViewAdapter extends RecyclerView.Adapter<ResponsesRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<GptResponse> gptResponses = new ArrayList<>();
+    private ArrayList<AiResponse> aiRespons = new ArrayList<>();
     private ResponseOptionListener listener;
 
     public ResponsesRecyclerViewAdapter(ResponseOptionListener listener) {
@@ -40,17 +37,17 @@ public class ResponsesRecyclerViewAdapter extends RecyclerView.Adapter<Responses
 
     @Override
     public void onBindViewHolder(@NonNull ResponsesRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.textFileName.setText(gptResponses.get(position).getSourceReadableFile());
-        holder.textSelectedText.setText(gptResponses.get(position).getSelectedText());
-        holder.textGptResponse.setText(gptResponses.get(position).getResponse());
+        holder.textFileName.setText(aiRespons.get(position).getReadableFileName());
+        holder.textSelectedText.setText(aiRespons.get(position).getSelectedText());
+        holder.textGptResponse.setText(aiRespons.get(position).getResponse());
 
         holder.responseCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
-                GptResponse gptResponse = gptResponses.get(position);
+                AiResponse aiResponse = aiRespons.get(position);
 
-                listener.openResponse(gptResponse);
+                listener.openResponse(aiResponse);
             }
         });
 
@@ -69,9 +66,9 @@ public class ResponsesRecyclerViewAdapter extends RecyclerView.Adapter<Responses
                         int itemId = item.getItemId();
 
                         if (itemId == R.id.response_action_open) {
-                            listener.openResponse(gptResponses.get(position));
+                            listener.openResponse(aiRespons.get(position));
                         } else if (itemId == R.id.response_action_delete) {
-                            listener.deleteResponse(gptResponses.get(position));
+                            listener.deleteResponse(aiRespons.get(position));
                         }
 
                         return true;
@@ -91,10 +88,10 @@ public class ResponsesRecyclerViewAdapter extends RecyclerView.Adapter<Responses
 
     @Override
     public int getItemCount() {
-        if (gptResponses == null) {
+        if (aiRespons == null) {
             return 0;
         } else {
-            return gptResponses.size();
+            return aiRespons.size();
         }
     }
 
@@ -114,13 +111,13 @@ public class ResponsesRecyclerViewAdapter extends RecyclerView.Adapter<Responses
         }
     }
 
-    public void setGptResponses(ArrayList<GptResponse> gptResponses) {
-        this.gptResponses = gptResponses;
+    public void setGptResponses(ArrayList<AiResponse> aiRespons) {
+        this.aiRespons = aiRespons;
         notifyDataSetChanged();
     }
 
     public interface ResponseOptionListener {
-        void openResponse(GptResponse gptResponse);
-        void deleteResponse(GptResponse gptResponse);
+        void openResponse(AiResponse aiResponse);
+        void deleteResponse(AiResponse aiResponse);
     }
 }

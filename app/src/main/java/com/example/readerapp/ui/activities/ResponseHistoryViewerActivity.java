@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.gptResponse.GptResponse;
-import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
+import com.example.readerapp.data.models.aiResponse.AiResponse;
+import com.example.readerapp.data.models.aiResponse.GptResponseViewModel;
 import com.example.readerapp.databinding.ActivityResponseHistoryViewerBinding;
 import com.example.readerapp.ui.adapters.ResponsesRecyclerViewAdapter;
 
@@ -26,7 +26,7 @@ public class ResponseHistoryViewerActivity extends AppCompatActivity implements 
     ActivityResponseHistoryViewerBinding binding;
     private RecyclerView responsesRecyclerView;
     private GptResponseViewModel mGptResponseViewModel;
-    private ArrayList<GptResponse> gptResponses = new ArrayList<>();
+    private ArrayList<AiResponse> aiRespons = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,35 +40,35 @@ public class ResponseHistoryViewerActivity extends AppCompatActivity implements 
         mGptResponseViewModel = new ViewModelProvider(this).get(GptResponseViewModel.class);
 
         ResponsesRecyclerViewAdapter adapter = new ResponsesRecyclerViewAdapter(this);
-        adapter.setGptResponses(gptResponses);
+        adapter.setGptResponses(aiRespons);
 
         responsesRecyclerView.setAdapter(adapter);
         responsesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mGptResponseViewModel.getAllGptResponses().observe(this, new Observer<List<GptResponse>>() {
+        mGptResponseViewModel.getAllGptResponses().observe(this, new Observer<List<AiResponse>>() {
             @Override
-            public void onChanged(List<GptResponse> gptResponses) {
+            public void onChanged(List<AiResponse> aiRespons) {
                 Log.d("MyLogs", "New list of GPT Responses obtained from database");
-                if (gptResponses != null) {
-                    Log.d("MyLogs", "List is not null. Size: " + gptResponses.size());
-                    adapter.setGptResponses((ArrayList<GptResponse>) gptResponses);
+                if (aiRespons != null) {
+                    Log.d("MyLogs", "List is not null. Size: " + aiRespons.size());
+                    adapter.setGptResponses((ArrayList<AiResponse>) aiRespons);
                 }
             }
         });
     }
 
     @Override
-    public void openResponse(GptResponse gptResponse) {
+    public void openResponse(AiResponse aiResponse) {
         Context context = this;
         Intent intent = new Intent(context, ResponseViewerActivity.class);
-        intent.putExtra("SELECTION", gptResponse.getSelectedText());
-        intent.putExtra("RESPONSE", gptResponse.getResponse());
-        intent.putExtra("FILENAME", gptResponse.getSourceReadableFile());
+        intent.putExtra("SELECTION", aiResponse.getSelectedText());
+        intent.putExtra("RESPONSE", aiResponse.getResponse());
+        intent.putExtra("FILENAME", aiResponse.getReadableFileName());
         context.startActivity(intent);
     }
 
     @Override
-    public void deleteResponse(GptResponse gptResponse) {
-        mGptResponseViewModel.delete(gptResponse);
+    public void deleteResponse(AiResponse aiResponse) {
+        mGptResponseViewModel.delete(aiResponse);
     }
 }

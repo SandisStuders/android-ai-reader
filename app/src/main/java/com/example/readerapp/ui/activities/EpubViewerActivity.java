@@ -22,8 +22,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.gptResponse.GptResponse;
-import com.example.readerapp.data.models.gptResponse.GptResponseViewModel;
+import com.example.readerapp.data.models.aiResponse.AiResponse;
+import com.example.readerapp.data.models.aiResponse.GptResponseViewModel;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
@@ -221,12 +221,12 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             handler.post(() -> {
                 Log.d("MyLogs", "Response: " + response);
 
-                GptResponse gptResponse = new GptResponse(fileName,
+                AiResponse aiResponse = new AiResponse(fileName,
                         fileRelativePath,
                         selectedText,
                         response,
                         currentChapter);
-                mGptResponseViewModel.insert(gptResponse);
+                mGptResponseViewModel.insert(aiResponse);
 
                 Intent intent = new Intent(this, ResponseViewerActivity.class);
                 intent.putExtra("SELECTION", selectedText);
