@@ -10,7 +10,12 @@ import android.util.Log;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.utils.HelperFunctions;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 
 public class ExternalStorageDataSource {
@@ -29,6 +34,7 @@ public class ExternalStorageDataSource {
 
         try (Cursor cursor = contentResolver.query(queryUri, projection, selection, selectionArgs, null)) {
             if (cursor != null && cursor.moveToFirst()) {
+                Log.d("MyLogs", "Cursor is not null");
 //                String[] colNames = cursor.getColumnNames();
 
                 int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
@@ -62,6 +68,52 @@ public class ExternalStorageDataSource {
             e.printStackTrace();
         }
 
+        return readableFiles;
+    }
+
+    public ArrayList<ReadableFile> retrieveReadableFilesByExtension(File baseDirectory, String fileExtension) {
+        ArrayList<ReadableFile> readableFiles = new ArrayList<>();
+        String extensionPattern = "." + fileExtension.toLowerCase();
+
+        File[] listFile = baseDirectory.listFiles();
+
+        if (listFile != null) {
+            for (File file : listFile) {
+                if (file.isDirectory()) {
+                    ArrayList<ReadableFile> subdirectoryReadableFiles = retrieveReadableFilesByExtension(file, fileExtension);
+                    readableFiles.addAll(subdirectoryReadableFiles);
+                } else {
+                    if (file.getName().toLowerCase().endsWith(extensionPattern)) {
+                        String name = file.getName();
+                        URI contentUri = file.toURI();
+                        long size = file.length();
+                        String adjustedFileSize = HelperFunctions.adjustByteSizeString(String.valueOf(size));
+                        String creationDate = "";
+                        try {
+                            BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                            String creationTimestamp = String.valueOf(attrs.creationTime().toMillis()/1000);
+                            creationDate = HelperFunctions.timestampToDate(creationTimestamp, "dd-MM-yyyy HH:mm");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        String filePath = file.getPath().replace("/storage/emulated/0/", "")
+                                .replace(name, "");
+
+                        ReadableFile fileDetails = new ReadableFile(name,
+                                contentUri.toString(),
+                                creationDate,
+                                adjustedFileSize,
+                                fileExtension.toUpperCase(),
+                                filePath,
+                                0,
+                                false);
+
+                        readableFiles.add(fileDetails);
+
+                    }
+                }
+            }
+        }
         return readableFiles;
     }
 
