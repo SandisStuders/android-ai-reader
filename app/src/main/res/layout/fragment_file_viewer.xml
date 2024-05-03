@@ -21,7 +21,8 @@
             android:layout_height="70dp"
             android:layout_gravity="bottom"
             style="@style/Widget.Material3.BottomAppBar"
-            app:menu="@menu/file_viewer_bottom_bar" />
+            app:menu="@menu/file_viewer_bottom_bar"
+            app:itemIconTint="@drawable/bottom_nav_icon_selector"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
