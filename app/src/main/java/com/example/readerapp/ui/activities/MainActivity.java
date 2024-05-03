@@ -81,14 +81,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
         if (savedInstanceState == null) { // Check to prevent adding the fragment again on rotate
             loadFileViewerFragment();
         } else {
             Log.d("MyLogs", "onCreate method with savedInstanceState bundle");
         }
-        
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         appToolbar = binding.appToolbar;
         setSupportActionBar(appToolbar);
 
