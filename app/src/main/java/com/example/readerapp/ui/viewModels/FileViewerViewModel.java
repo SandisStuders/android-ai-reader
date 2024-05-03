@@ -2,8 +2,6 @@ package com.example.readerapp.ui.viewModels;
 
 import android.app.Application;
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -13,12 +11,9 @@ import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
 import com.example.readerapp.data.repositories.ExternalFileRepository;
 
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class FileViewerViewModel extends AndroidViewModel {
 
@@ -73,7 +68,7 @@ public class FileViewerViewModel extends AndroidViewModel {
     }
 
     private void refreshDatabaseWithStorageData() {
-        ArrayList<ReadableFile> storageFiles = externalFileRepository.retrieveReadableFilesByMimeType("application/epub+zip", "EPUB");
+        ArrayList<ReadableFile> storageFiles = externalFileRepository.retrieveReadableFiles();
 
         mReadableFileRepository.deleteFilesThatDoNotExist(storageFiles);
 

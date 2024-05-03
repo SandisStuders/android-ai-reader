@@ -5,15 +5,21 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.example.readerapp.data.dataSources.ExternalStorageDataSource;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExternalFileRepository {
+
+    private final Set<FileType> readableFileTypes = new HashSet<>(Arrays.asList(
+            new FileType("EPUB", "application/epub+zip")
+    ));
 
     private final ExternalStorageDataSource externalStorageDataSource;
     private final Application application;
@@ -23,34 +29,38 @@ public class ExternalFileRepository {
         this.externalStorageDataSource = new ExternalStorageDataSource(application.getContentResolver());
     }
 
-    public ArrayList<ReadableFile> retrieveReadableFilesByMimeType(String mimeType, String fileType) {
-        ArrayList<ReadableFile> readableFiles;
-
-        Log.d("MyLogs", "retrieveReadableFilesByMimeType: FUNCTION ENGAGED");
+    public ArrayList<ReadableFile> retrieveReadableFiles() {
+        ArrayList<ReadableFile> readableFiles = new ArrayList<>();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            String[] projection = new String[]{
-                    MediaStore.Files.FileColumns._ID,
-                    MediaStore.Files.FileColumns.DISPLAY_NAME,
-                    MediaStore.Files.FileColumns.DATE_ADDED,
-                    MediaStore.Files.FileColumns.SIZE,
-                    MediaStore.Files.FileColumns.RELATIVE_PATH,
-                    MediaStore.Files.FileColumns.MIME_TYPE
-            };
+            for (FileType fileType : readableFileTypes) {
+                String fileExtension = fileType.extension;
+                String mimeType = fileType.mimeType;
 
-            // Filter for MIME type
-            String selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-            String[] selectionArgs = new String[]{mimeType};
+                String[] projection = new String[]{
+                        MediaStore.Files.FileColumns._ID,
+                        MediaStore.Files.FileColumns.DISPLAY_NAME,
+                        MediaStore.Files.FileColumns.DATE_ADDED,
+                        MediaStore.Files.FileColumns.SIZE,
+                        MediaStore.Files.FileColumns.RELATIVE_PATH,
+                        MediaStore.Files.FileColumns.MIME_TYPE
+                };
+                String sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC";
+                ArrayList<ReadableFile> fileTypeReadableFiles = externalStorageDataSource.retrieveReadableFilesByMimeType(projection, mimeType, sortOrder);
 
-            readableFiles = externalStorageDataSource.retrieveReadableFilesByMimeType(projection, selection, selectionArgs);
-            for (ReadableFile readableFile : readableFiles) {
-                readableFile.setFileType(fileType);
+                for (ReadableFile readableFile : fileTypeReadableFiles) {
+                    readableFile.setFileType(fileExtension);
+                }
+                readableFiles.addAll(fileTypeReadableFiles);
             }
 
         } else {
-            Log.d("MyLogs", "retrieveReadableFilesByMimeType: CORRECT BRANCH TAKEN");
-            File contentPath = Environment.getExternalStorageDirectory();
-            readableFiles = externalStorageDataSource.retrieveReadableFilesByExtension(contentPath, "EPUB");
+            for (FileType fileType : readableFileTypes) {
+                String fileExtension = fileType.extension;
+                File contentPath = Environment.getExternalStorageDirectory();
+                ArrayList<ReadableFile> fileTypeReadableFiles = externalStorageDataSource.retrieveReadableFilesByExtension(contentPath, fileExtension);
+                readableFiles.addAll(fileTypeReadableFiles);
+            }
         }
 
         return readableFiles;
@@ -59,6 +69,16 @@ public class ExternalFileRepository {
     public boolean fileExists(ReadableFile readableFile) {
         Uri uri = Uri.parse(readableFile.getContentUri());
         return externalStorageDataSource.fileExists(uri);
+    }
+
+    private static class FileType {
+        public String extension;
+        public String mimeType;
+
+        FileType(String extension, String mimeType) {
+            this.extension = extension;
+            this.mimeType = mimeType;
+        }
     }
 
 }

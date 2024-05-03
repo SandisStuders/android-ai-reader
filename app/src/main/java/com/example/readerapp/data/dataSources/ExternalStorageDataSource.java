@@ -26,15 +26,18 @@ public class ExternalStorageDataSource {
         this.contentResolver = contentResolver;
     }
 
-    public ArrayList<ReadableFile> retrieveReadableFilesByMimeType(String[] projection, String selection, String[] selectionArgs) {
+    public ArrayList<ReadableFile> retrieveReadableFilesByMimeType(String[] projection, String mimeType, String sortOrder) {
         ArrayList<ReadableFile> readableFiles = new ArrayList<>();
 
         // Query URI for external files content
         Uri queryUri = MediaStore.Files.getContentUri("external");
 
-        try (Cursor cursor = contentResolver.query(queryUri, projection, selection, selectionArgs, null)) {
+        // Filter for MIME type
+        String selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
+        String[] selectionArgs = new String[]{mimeType};
+
+        try (Cursor cursor = contentResolver.query(queryUri, projection, selection, selectionArgs, sortOrder)) {
             if (cursor != null && cursor.moveToFirst()) {
-                Log.d("MyLogs", "Cursor is not null");
 //                String[] colNames = cursor.getColumnNames();
 
                 int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
@@ -109,7 +112,6 @@ public class ExternalStorageDataSource {
                                 false);
 
                         readableFiles.add(fileDetails);
-
                     }
                 }
             }
