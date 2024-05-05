@@ -19,7 +19,7 @@
             android:layout_width="40dp"
             android:layout_height="60dp"
             android:layout_marginStart="5dp"
-            android:src="@drawable/pdf_default_thumbnail" />
+            android:src="@drawable/default_thumbnail" />
 
         <TextView
             android:id="@+id/file_name"
