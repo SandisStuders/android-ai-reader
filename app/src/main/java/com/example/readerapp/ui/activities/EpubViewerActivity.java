@@ -83,7 +83,8 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         });
 
         String uriString = intent.getStringExtra("URI_STRING");
-        this.baseUrl = epubViewerViewModel.getBookAndReturnBaseUrl(uriString);
+        epubViewerViewModel.initializeEpubBook(uriString);
+        this.baseUrl = epubViewerViewModel.getBookContentBaseUrl();
 
         bottomAppBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override

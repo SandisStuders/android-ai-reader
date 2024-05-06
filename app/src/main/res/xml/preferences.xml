@@ -54,7 +54,7 @@
         <SeekBarPreference
             android:key="temperature"
             android:title="@string/settings_preference_temperature"
-            android:max="100"
+            android:max="200"
             app:showSeekBarValue="true"
             android:defaultValue="40"/>
     </PreferenceCategory>

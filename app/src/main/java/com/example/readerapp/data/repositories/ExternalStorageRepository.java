@@ -5,17 +5,25 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.example.readerapp.data.dataSources.ExternalStorageDataSource;
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ExternalFileRepository {
+import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.epub.EpubReader;
+
+public class ExternalStorageRepository {
 
     private final Set<FileType> readableFileTypes = new HashSet<>(Arrays.asList(
             new FileType("EPUB", "application/epub+zip")
@@ -24,7 +32,7 @@ public class ExternalFileRepository {
     private final ExternalStorageDataSource externalStorageDataSource;
     private final Application application;
 
-    public ExternalFileRepository(Application application) {
+    public ExternalStorageRepository(Application application) {
         this.application = application;
         this.externalStorageDataSource = new ExternalStorageDataSource(application.getContentResolver());
     }
@@ -69,6 +77,34 @@ public class ExternalFileRepository {
     public boolean fileExists(ReadableFile readableFile) {
         Uri uri = Uri.parse(readableFile.getContentUri());
         return externalStorageDataSource.fileExists(uri);
+    }
+
+    public Book getEpubWithUriString(String uriString) {
+        try {
+            Uri uri = Uri.parse(uriString);
+            InputStream fileStream = application.getContentResolver().openInputStream(uri);
+            return  (new EpubReader()).readEpub(fileStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getEpubResourceContent(Resource resource) {
+        StringBuilder contentBuilder = new StringBuilder();
+        try {
+            InputStreamReader contentReader = new InputStreamReader(resource.getInputStream());
+            BufferedReader r = new BufferedReader(contentReader);
+            String aux = "";
+            while ((aux = r.readLine()) != null) {
+                contentBuilder.append(aux);
+                contentBuilder.append('\n');
+            }
+            return contentBuilder.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private static class FileType {

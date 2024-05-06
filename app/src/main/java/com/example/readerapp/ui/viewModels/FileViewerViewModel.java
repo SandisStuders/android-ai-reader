@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer;
 
 import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
-import com.example.readerapp.data.repositories.ExternalFileRepository;
+import com.example.readerapp.data.repositories.ExternalStorageRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Objects;
 public class FileViewerViewModel extends AndroidViewModel {
 
     private final ReadableFileRepository mReadableFileRepository;
-    private final ExternalFileRepository externalFileRepository;
+    private final ExternalStorageRepository externalStorageRepository;
     private LiveData<List<ReadableFile>> mAllReadableFiles;
     private LiveData<List<ReadableFile>> mFavoriteFiles;
     private LiveData<List<ReadableFile>> mRecentFiles;
@@ -31,7 +31,7 @@ public class FileViewerViewModel extends AndroidViewModel {
     public FileViewerViewModel(Application application) {
         super(application);
         mReadableFileRepository = new ReadableFileRepository(application);
-        externalFileRepository = new ExternalFileRepository(application);
+        externalStorageRepository = new ExternalStorageRepository(application);
         context = application.getApplicationContext();
     }
 
@@ -68,7 +68,7 @@ public class FileViewerViewModel extends AndroidViewModel {
     }
 
     private void refreshDatabaseWithStorageData() {
-        ArrayList<ReadableFile> storageFiles = externalFileRepository.retrieveReadableFiles();
+        ArrayList<ReadableFile> storageFiles = externalStorageRepository.retrieveReadableFiles();
 
         mReadableFileRepository.deleteFilesThatDoNotExist(storageFiles);
 
@@ -88,7 +88,7 @@ public class FileViewerViewModel extends AndroidViewModel {
     }
 
     public boolean prepareFileOpen(ReadableFile readableFile) {
-        if (!externalFileRepository.fileExists(readableFile)) {
+        if (!externalStorageRepository.fileExists(readableFile)) {
             return false;
         }
 
