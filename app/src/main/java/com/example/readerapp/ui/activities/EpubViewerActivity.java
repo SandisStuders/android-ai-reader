@@ -132,12 +132,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
             return;
         }
 
-        String response = "";
-        try {
-            response = epubViewerViewModel.obtainAiResponse(selectedText, useDefaultSystemPrompt).get();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        String response = epubViewerViewModel.obtainAiResponse(selectedText, useDefaultSystemPrompt);
 
         Intent intent = new Intent(this, ResponseViewerActivity.class);
         intent.putExtra("SELECTION", selectedText);

@@ -34,6 +34,7 @@ public class EpubViewerViewModel extends AndroidViewModel {
     ReadableFileRepository readableFileRepository;
     AiConnectionRepository aiConnectionRepository;
     EpubDocumentRepository epubDocumentRepository;
+    AiResponseRepository aiResponseRepository;
 
     ArrayList<Chapter> chapters = new ArrayList<>();
     int currentChapter = 0;
@@ -48,6 +49,7 @@ public class EpubViewerViewModel extends AndroidViewModel {
         readableFileRepository = new ReadableFileRepository(application);
         aiConnectionRepository = new AiConnectionRepository(application);
         epubDocumentRepository = new EpubDocumentRepository(application);
+        aiResponseRepository = new AiResponseRepository(application);
     }
 
     public void initializeEpubBook(String uriString) {
@@ -135,11 +137,23 @@ public class EpubViewerViewModel extends AndroidViewModel {
         return SELECTED_TEXT_MAX_CHARS;
     }
 
-    public CompletableFuture<String> obtainAiResponse(String selectedText, boolean useDefaultSystemPrompt) {
+    public String obtainAiResponse(String selectedText, boolean useDefaultSystemPrompt) {
         String bookTitle = "";
         if (sourceFile != null) {
             bookTitle = sourceFile.getFileName();
         }
-        return aiConnectionRepository.obtainAiResponse(selectedText, bookTitle, useDefaultSystemPrompt, sourceFile);
+        try {
+            String response = aiConnectionRepository.obtainAiResponse(selectedText, bookTitle, useDefaultSystemPrompt, sourceFile).get();
+            AiResponse aiResponse = new AiResponse(sourceFile.getFileName(),
+                    sourceFile.getRelativePath(),
+                    selectedText,
+                    response,
+                    sourceFile.getLastOpenChapter());
+            aiResponseRepository.insert(aiResponse);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
