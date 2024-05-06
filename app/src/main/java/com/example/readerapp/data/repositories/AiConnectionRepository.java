@@ -30,6 +30,8 @@ public class AiConnectionRepository {
     "on what they'd like to receive in the response. Prompt may include the filename as additional " +
     "context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
 
+    private final int SELECTED_TEXT_MAX_CHARS = 1200;
+
     Application application;
     SharedPreferencesRepository sharedPreferencesRepository;
     AiResponseRepository aiResponseRepository;
@@ -94,6 +96,14 @@ public class AiConnectionRepository {
         });
 
         return returnableResponse;
+    }
+
+    public boolean selectedTextTooLong(String selectedText) {
+        return selectedText.length() > SELECTED_TEXT_MAX_CHARS;
+    }
+
+    public int getSelectedTextMaxChars() {
+        return SELECTED_TEXT_MAX_CHARS;
     }
 
 }

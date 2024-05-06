@@ -2,14 +2,9 @@ package com.example.readerapp.ui.viewModels;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.data.models.aiResponse.AiResponse;
 import com.example.readerapp.data.models.aiResponse.AiResponseRepository;
@@ -18,16 +13,10 @@ import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
 import com.example.readerapp.data.repositories.AiConnectionRepository;
 import com.example.readerapp.data.repositories.EpubDocumentRepository;
 import com.example.readerapp.data.repositories.EpubDocumentRepository.Chapter;
-import com.example.readerapp.data.services.ChatGptApiService;
 
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class EpubViewerViewModel extends AndroidViewModel {
-
-    private final int SELECTED_TEXT_MAX_CHARS = 600;
 
     Application application;
     Context context;
@@ -40,7 +29,6 @@ public class EpubViewerViewModel extends AndroidViewModel {
     int currentChapter = 0;
     boolean chapterChanged = false;
     ReadableFile sourceFile;
-
 
     public EpubViewerViewModel(Application application) {
         super(application);
@@ -127,14 +115,12 @@ public class EpubViewerViewModel extends AndroidViewModel {
         this.currentChapter = readableFile.getLastOpenChapter();
     }
 
-    // AI REPOSITORY
-
     public boolean selectedTextTooLong(String selectedText) {
-        return selectedText.length() > SELECTED_TEXT_MAX_CHARS;
+        return aiConnectionRepository.selectedTextTooLong(selectedText);
     }
 
     public int getSelectedTextMaxChars() {
-        return SELECTED_TEXT_MAX_CHARS;
+        return aiConnectionRepository.getSelectedTextMaxChars();
     }
 
     public String obtainAiResponse(String selectedText, boolean useDefaultSystemPrompt) {
