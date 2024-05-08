@@ -3,17 +3,13 @@ package com.example.readerapp.ui.activities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.os.LocaleListCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
 import com.example.readerapp.ui.fragments.SettingsFragment;
-import com.example.readerapp.ui.viewModels.EpubViewerViewModel;
 import com.example.readerapp.ui.viewModels.SettingsViewModel;
 
 public class SettingsActivity extends AppCompatActivity {

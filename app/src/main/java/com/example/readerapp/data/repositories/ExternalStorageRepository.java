@@ -95,7 +95,7 @@ public class ExternalStorageRepository {
         try {
             InputStreamReader contentReader = new InputStreamReader(resource.getInputStream());
             BufferedReader r = new BufferedReader(contentReader);
-            String aux = "";
+            String aux;
             while ((aux = r.readLine()) != null) {
                 contentBuilder.append(aux);
                 contentBuilder.append('\n');

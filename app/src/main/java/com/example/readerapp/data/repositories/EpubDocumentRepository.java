@@ -102,7 +102,7 @@ public class EpubDocumentRepository {
         ArrayList<Chapter> chapters = new ArrayList<>();
         for (int i = 0; i < spine.size(); i++) {
             String chapterTitle = spine.getResource(i).getTitle();
-            if (chapterTitle == null) {
+            if (chapterTitle == null || chapterTitle.equals("")) {
                 chapterTitle = String.valueOf(i);
             }
             String chapterContent = externalStorageRepository.getEpubResourceContent(spine.getResource(i));

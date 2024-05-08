@@ -19,7 +19,7 @@ public class ChatGptApiService {
 
     public ChatGptApiService() {
         apiEndpoint = "https://api.openai.com/v1/chat/completions";
-        apiKey = "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";
+        apiKey = "";
         model = "gpt-3.5-turbo";
     }
 
