@@ -26,7 +26,7 @@ public class AiConnectionRepository {
 
     private final String personalPromptSystemPrompt = "You are an AI assistant integrated into a " +
     "mobile reading application. The user has selected certain text from the document they are " +
-    "reading and sent to you as a prompt. Their prompt also includes more specific instructions " +
+    "reading and sent to you as a prompt. Their prompt also includes instructions " +
     "on what they'd like to receive in the response. Prompt may include the filename as additional " +
     "context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
 
@@ -76,11 +76,8 @@ public class AiConnectionRepository {
 
         CompletableFuture<String> returnableResponse = new CompletableFuture<>();
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            String response = chatGptApiService.processPrompt(systemPrompt, prompt, MAX_GENERATED_TOKENS, temperature);
-            returnableResponse.complete(response);
-        });
+        String response = chatGptApiService.processPrompt(systemPrompt, prompt, MAX_GENERATED_TOKENS, temperature);
+        returnableResponse.complete(response);
 
         return returnableResponse;
     }

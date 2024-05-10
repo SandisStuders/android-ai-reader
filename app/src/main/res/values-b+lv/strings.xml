@@ -41,6 +41,7 @@
     <string name="document_selection_alert_text_1">Atvainojiet! Šobrīd tikai teksts līdz&#xA0;</string>
     <string name="document_selection_alert_text_2">&#xA0;simboliem var tikt paskaidrots ar AI.</string>
 
+    <string name="response_generation_started_text">Mākslīgā intelekta atbilde tiek ģenerēta…</string>
     <string name="response_error_snack_bar_text">Mēģinot saņemt atbildi no ChatGPT radās kļūda!</string>
 
     <!-- Settings Screen -->

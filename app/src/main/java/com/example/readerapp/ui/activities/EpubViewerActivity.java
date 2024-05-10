@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -154,18 +155,27 @@ public class EpubViewerActivity extends AppCompatActivity {
             return;
         }
 
-        String response = epubViewerViewModel.obtainAiResponse(selectedText, useDefaultSystemPrompt);
-        if (response == null || response.equals("")) {
-            Snackbar.make(epubViewer, getString(R.string.response_error_snack_bar_text), Snackbar.LENGTH_SHORT)
-                    .setAnchorView(bottomAppBar)
-                    .show();
-        } else {
-            Intent intent = new Intent(this, ResponseViewerActivity.class);
-            intent.putExtra("SELECTION", selectedText);
-            intent.putExtra("RESPONSE", response);
-            intent.putExtra("FILENAME", epubViewerViewModel.getSourceFileName());
-            this.startActivity(intent);
-        }
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            String response = epubViewerViewModel.obtainAiResponse(selectedText, useDefaultSystemPrompt);
+
+            handler.post(() -> {
+                if (response == null || response.equals("")) {
+                    Snackbar.make(epubViewer, getString(R.string.response_error_snack_bar_text), Snackbar.LENGTH_SHORT)
+                            .setAnchorView(bottomAppBar)
+                            .show();
+                } else {
+                    Intent intent = new Intent(this, ResponseViewerActivity.class);
+                    intent.putExtra("SELECTION", selectedText);
+                    intent.putExtra("RESPONSE", response);
+                    intent.putExtra("FILENAME", epubViewerViewModel.getSourceFileName());
+                    this.startActivity(intent);
+                }
+            });
+        });
+        Toast.makeText(this, getString(R.string.response_generation_started_text), Toast.LENGTH_SHORT).show();
     }
 
     public void showTextTooLongAlert() {

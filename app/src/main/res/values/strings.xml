@@ -38,6 +38,7 @@
     <string name="document_selection_alert_text_1">Sorry! Currently, only text up to&#xA0;</string>
     <string name="document_selection_alert_text_2">&#xA0;symbols can be processed by AI.</string>
 
+    <string name="response_generation_started_text">AI Response is being generated…</string>
     <string name="response_error_snack_bar_text">Error while trying to obtain a response from ChatGPT!</string>
 
     <!-- Settings Screen -->
