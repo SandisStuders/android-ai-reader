@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
 }
@@ -5,6 +7,10 @@ plugins {
 android {
     namespace = "com.example.readerapp"
     compileSdk = 34
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.example.readerapp"
@@ -14,6 +20,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val apiKey = localProperties["CHATGPT_API_KEY"] as? String ?: ""
+        buildConfigField("String", "CHATGPT_API_KEY", "\"$apiKey\"")
     }
 
     buildFeatures {

@@ -30,7 +30,8 @@ public class AiConnectionRepository {
     "on what they'd like to receive in the response. Prompt may include the filename as additional " +
     "context, use it, if it is beneficial. Try to keep your response encompassing but reasonably concise.";
 
-    private final int SELECTED_TEXT_MAX_CHARS = 1200;
+    private final int MAX_GENERATED_TOKENS = 1000;
+    private final int SELECTED_TEXT_MAX_CHARS = 2000;
 
     Application application;
     SharedPreferencesRepository sharedPreferencesRepository;
@@ -78,7 +79,7 @@ public class AiConnectionRepository {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         executor.execute(() -> {
-            String response = chatGptApiService.processPrompt(systemPrompt, prompt, temperature);
+            String response = chatGptApiService.processPrompt(systemPrompt, prompt, MAX_GENERATED_TOKENS, temperature);
             returnableResponse.complete(response);
 
             handler.post(() -> {

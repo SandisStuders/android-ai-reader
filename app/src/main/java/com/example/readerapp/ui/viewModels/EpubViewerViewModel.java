@@ -140,6 +140,6 @@ public class EpubViewerViewModel extends AndroidViewModel {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "";
+        return null;
     }
 }

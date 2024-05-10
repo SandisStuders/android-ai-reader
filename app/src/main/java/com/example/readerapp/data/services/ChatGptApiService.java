@@ -2,6 +2,8 @@ package com.example.readerapp.data.services;
 
 import android.util.Log;
 
+import com.example.readerapp.BuildConfig;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,18 +15,18 @@ import org.json.JSONObject;
 
 public class ChatGptApiService {
 
-    private final String apiKey;
-    private final String apiEndpoint;
-    private String model;
+    private final String apiEndpoint = "https://api.openai.com/v1/chat/completions";
+    private final String apiKey = BuildConfig.CHATGPT_API_KEY;
+    private final String model = "gpt-3.5-turbo";
 
     public ChatGptApiService() {
-        apiEndpoint = "https://api.openai.com/v1/chat/completions";
-        apiKey = "";
-        model = "gpt-3.5-turbo";
+
     }
 
-    public String processPrompt(String systemPrompt, String prompt, Double temperature) {
+    public String processPrompt(String systemPrompt, String prompt, int maxTokens, Double temperature) {
         try {
+
+            Log.d("MyLogs", "API KEY: " + apiKey);
             URI uri = new URI(apiEndpoint);
             URL urlObj = uri.toURL();
 
@@ -37,11 +39,11 @@ public class ChatGptApiService {
             String body = String.format(
                     "{\"model\": \"%s\", " +
                             "\"messages\": [{\"role\": \"system\", \"content\": \"%s\"}, {\"role\": \"user\", \"content\": \"%s\"}], " +
+                            "\"max_tokens\": %s, " +
                             "\"temperature\": %s}",
-                    model, systemPrompt, prompt, temperature
+                    model, systemPrompt, prompt, maxTokens, temperature
             );
-
-            Log.d("MyPrompts", "PROMPT SENT TO API: " + body);
+            Log.d("MyLogs", "Raw request: " + body);
 
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
@@ -65,9 +67,10 @@ public class ChatGptApiService {
             return extractMessageFromJSONResponse(response.toString());
 
         } catch (URISyntaxException | IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
+        return null;
     }
 
     public static String extractMessageFromJSONResponse(String response) {

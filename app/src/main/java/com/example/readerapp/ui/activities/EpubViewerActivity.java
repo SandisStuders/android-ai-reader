@@ -32,6 +32,7 @@ import com.example.readerapp.ui.viewModels.EpubViewerViewModel;
 import com.example.readerapp.ui.viewModels.FileViewerViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,12 +134,17 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         }
 
         String response = epubViewerViewModel.obtainAiResponse(selectedText, useDefaultSystemPrompt);
-
-        Intent intent = new Intent(this, ResponseViewerActivity.class);
-        intent.putExtra("SELECTION", selectedText);
-        intent.putExtra("RESPONSE", response);
-        intent.putExtra("FILENAME", epubViewerViewModel.getSourceFileName());
-        this.startActivity(intent);
+        if (response == null || response.equals("")) {
+            Snackbar.make(epubViewer, getString(R.string.response_error_snack_bar_text), Snackbar.LENGTH_SHORT)
+                    .setAnchorView(bottomAppBar)
+                    .show();
+        } else {
+            Intent intent = new Intent(this, ResponseViewerActivity.class);
+            intent.putExtra("SELECTION", selectedText);
+            intent.putExtra("RESPONSE", response);
+            intent.putExtra("FILENAME", epubViewerViewModel.getSourceFileName());
+            this.startActivity(intent);
+        }
     }
 
     public void showTextTooLongAlert() {
