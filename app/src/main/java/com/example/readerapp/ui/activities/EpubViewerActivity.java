@@ -1,6 +1,8 @@
 package com.example.readerapp.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,7 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.epub.EpubReader;
 
-public class EpubViewerActivity extends AppCompatActivity implements ReaderView.ActionModeCallback {
+public class EpubViewerActivity extends AppCompatActivity {
 
     private EpubViewerViewModel epubViewerViewModel;
 
@@ -52,10 +54,12 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
     BottomNavigationView bottomAppBar;
 
     private String baseUrl;
+    Context context;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_viewer);
 
@@ -63,7 +67,6 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         epubViewer = binding.epubViewer;
         bottomAppBar = binding.bottomAppBar;
 
-        epubViewer.setActionModeCallback(this);
         WebSettings webSettings = epubViewer.getSettings();
         webSettings.setAllowFileAccess(true);
         webSettings.setJavaScriptEnabled(true);
@@ -87,30 +90,49 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
         epubViewerViewModel.initializeEpubBook(uriString);
         this.baseUrl = epubViewerViewModel.getBookContentBaseUrl();
 
-        bottomAppBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
+        bottomAppBar.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
 
-                if (itemId == R.id.prevChapter) {
-                    epubViewerViewModel.decreaseChapter();
-                    if (epubViewerViewModel.chapterChanged()) {
-                        loadCurrentChapter();
-                    }
-                    return true;
-                } else if (itemId == R.id.selectChapter) {
-                    String[] chapterTitles = epubViewerViewModel.getChapterTitles();
-                    showChapterList(chapterTitles);
-                    return true;
-                } else if (itemId == R.id.nextChapter) {
-                    epubViewerViewModel.increaseChapter();
-                    if (epubViewerViewModel.chapterChanged()) {
-                        loadCurrentChapter();
-                    }
-                    return true;
+            if (itemId == R.id.prevChapter) {
+                epubViewerViewModel.decreaseChapter();
+                if (epubViewerViewModel.chapterChanged()) {
+                    loadCurrentChapter();
                 }
+                return true;
+            } else if (itemId == R.id.selectChapter) {
+                String[] chapterTitles = epubViewerViewModel.getChapterTitles();
+                showChapterList(chapterTitles);
+                return true;
+            } else if (itemId == R.id.nextChapter) {
+                epubViewerViewModel.increaseChapter();
+                if (epubViewerViewModel.chapterChanged()) {
+                    loadCurrentChapter();
+                }
+                return true;
+            }
 
-                return false;
+            return false;
+        });
+
+        epubViewer.setOnContextualActionSelectedListener(new ReaderView.OnContextualActionSelectedListener() {
+            @Override
+            public void onExplainItemSelected(String selectedText) {
+                receiveAiResponse(selectedText, true);
+            }
+
+            @Override
+            public void onCopyItemSelected(String selectedText) {
+                String processedValue = selectedText.replaceAll("^\"|\"$", "");
+                //TODO: JavaScript copies string as JSON string therefore escape characters possible. These should be escaped
+
+                ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("default", processedValue);
+                clipboardManager.setPrimaryClip(clip);
+            }
+
+            @Override
+            public void onPersonalPromptItemSelected(String selectedText) {
+                receiveAiResponse(selectedText, false);
             }
         });
 
@@ -126,8 +148,7 @@ public class EpubViewerActivity extends AppCompatActivity implements ReaderView.
                 null);
     }
 
-    @Override
-    public void onTextSelected(String selectedText, boolean useDefaultSystemPrompt) {
+    public void receiveAiResponse(String selectedText, boolean useDefaultSystemPrompt) {
         if (epubViewerViewModel.selectedTextTooLong(selectedText)) {
             showTextTooLongAlert();
             return;

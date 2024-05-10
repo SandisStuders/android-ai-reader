@@ -28,10 +28,11 @@ import java.util.concurrent.Executors;
 
 public class ReaderView extends WebView {
 
+    private OnContextualActionSelectedListener actionSelectedListener;
+
     MenuItem explainItem;
     MenuItem copyItem;
     MenuItem personalPromptItem;
-    private ActionModeCallback actionModeCallback;
 
     public ReaderView(@NonNull Context context) {
         super(context);
@@ -67,9 +68,7 @@ public class ReaderView extends WebView {
         return new ActionMode.Callback() {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                boolean result = callback.onCreateActionMode(mode, menu);
-
-                return result;
+                return callback.onCreateActionMode(mode, menu);
             }
 
             @Override
@@ -96,15 +95,13 @@ public class ReaderView extends WebView {
                 evaluateJavascript("(function(){return window.getSelection().toString();})()", new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String value) {
-                        if (item == explainItem) {
-                            if (actionModeCallback != null) {
-                                actionModeCallback.onTextSelected(value, true);
-                            }
-                        } else if (item == copyItem) {
-                            actionCopy(value);
-                        } else if (item == personalPromptItem) {
-                            if (actionModeCallback != null) {
-                                actionModeCallback.onTextSelected(value, false);
+                        if (actionSelectedListener != null) {
+                            if (item == explainItem) {
+                                actionSelectedListener.onExplainItemSelected(value);
+                            } else if (item == copyItem) {
+                                actionSelectedListener.onCopyItemSelected(value);
+                            } else if (item == personalPromptItem) {
+                                actionSelectedListener.onPersonalPromptItemSelected(value);
                             }
                         }
                     }
@@ -120,21 +117,14 @@ public class ReaderView extends WebView {
         };
     }
 
-    private void actionCopy(String value) {
-        String processedValue = value.replaceAll("^\"|\"$", "");
-        //TODO: JavaScript copies string as JSON string therefore escape characters possible. These should be escaped
-
-        ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("default", processedValue);
-        clipboardManager.setPrimaryClip(clip);
+    public void setOnContextualActionSelectedListener(OnContextualActionSelectedListener listener) {
+        this.actionSelectedListener = listener;
     }
 
-    public void setActionModeCallback(ActionModeCallback callback) {
-        this.actionModeCallback = callback;
-    }
-
-    public interface ActionModeCallback {
-        void onTextSelected(String selectedText, boolean useDefaultSystemPrompt);
+    public interface OnContextualActionSelectedListener {
+        void onExplainItemSelected(String selectedText);
+        void onCopyItemSelected(String selectedText);
+        void onPersonalPromptItemSelected(String selectedText);
     }
 
 }
