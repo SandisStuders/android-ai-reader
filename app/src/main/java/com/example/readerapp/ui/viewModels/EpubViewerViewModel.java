@@ -129,7 +129,7 @@ public class EpubViewerViewModel extends AndroidViewModel {
             bookTitle = sourceFile.getFileName();
         }
         try {
-            String response = aiConnectionRepository.obtainAiResponse(selectedText, bookTitle, useDefaultSystemPrompt, sourceFile).get();
+            String response = aiConnectionRepository.obtainAiResponse(selectedText, bookTitle, useDefaultSystemPrompt).get();
             AiResponse aiResponse = new AiResponse(sourceFile.getFileName(),
                     sourceFile.getRelativePath(),
                     selectedText,

@@ -43,15 +43,15 @@ public class AiConnectionRepository {
         aiResponseRepository = new AiResponseRepository(application);
     }
 
-    public CompletableFuture<String> obtainAiResponse(String documentQuote, String documentTitle, boolean useDefaultPrompt, ReadableFile readableFile) {
+    public CompletableFuture<String> obtainAiResponse(String documentQuote, String documentTitle, boolean useDefaultPrompt) {
         double temperature = (double) sharedPreferencesRepository.getTemperature() / 100;
 
         String prompt = constructAiPrompt(documentQuote, documentTitle, useDefaultPrompt);
 
         if (useDefaultPrompt) {
-            return receiveAiResponse(prompt, defaultSystemPrompt, temperature, readableFile);
+            return receiveAiResponse(prompt, defaultSystemPrompt, temperature);
         } else {
-            return receiveAiResponse(prompt, personalPromptSystemPrompt, temperature, readableFile);
+            return receiveAiResponse(prompt, personalPromptSystemPrompt, temperature);
         }
     }
 
@@ -71,29 +71,15 @@ public class AiConnectionRepository {
         return prompt;
     }
 
-    public CompletableFuture<String> receiveAiResponse(String prompt, String systemPrompt, double temperature, ReadableFile readableFile) {
+    public CompletableFuture<String> receiveAiResponse(String prompt, String systemPrompt, double temperature) {
         ChatGptApiService chatGptApiService = new ChatGptApiService();
 
         CompletableFuture<String> returnableResponse = new CompletableFuture<>();
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
         executor.execute(() -> {
             String response = chatGptApiService.processPrompt(systemPrompt, prompt, MAX_GENERATED_TOKENS, temperature);
             returnableResponse.complete(response);
-
-            handler.post(() -> {
-                Log.d("MyLogs", "Response: " + response);
-
-                AiResponse aiResponse = new AiResponse(readableFile.getFileName(),
-                        readableFile.getRelativePath(),
-                        prompt,
-                        response,
-                        readableFile.getLastOpenChapter());
-                aiResponseRepository.insert(aiResponse);
-
-
-            });
         });
 
         return returnableResponse;

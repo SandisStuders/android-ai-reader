@@ -14,7 +14,7 @@ import java.util.List;
 @Dao
 public interface AiResponseDao {
 
-    @Query("SELECT * FROM aiResponses")
+    @Query("SELECT * FROM aiResponses ORDER BY id DESC")
     LiveData<List<AiResponse>> getAllGptResponses();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
