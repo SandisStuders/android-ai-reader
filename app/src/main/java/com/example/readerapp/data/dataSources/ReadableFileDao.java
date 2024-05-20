@@ -1,4 +1,4 @@
-package com.example.readerapp.data.models.readableFile;
+package com.example.readerapp.data.dataSources;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.ReadableFile;
 
 import java.util.ArrayList;
 import java.util.List;

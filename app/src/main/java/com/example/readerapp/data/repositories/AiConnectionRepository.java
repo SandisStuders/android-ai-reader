@@ -1,18 +1,10 @@
 package com.example.readerapp.data.repositories;
 
 import android.app.Application;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 
-import com.example.readerapp.data.models.aiResponse.AiResponse;
-import com.example.readerapp.data.models.aiResponse.AiResponseRepository;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
 import com.example.readerapp.data.services.ChatGptApiService;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class AiConnectionRepository {
 

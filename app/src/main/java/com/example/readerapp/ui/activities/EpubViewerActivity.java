@@ -3,17 +3,12 @@ package com.example.readerapp.ui.activities;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.widget.Toast;
 
@@ -22,29 +17,17 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.aiResponse.AiResponse;
-import com.example.readerapp.data.models.aiResponse.GptResponseViewModel;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.services.ChatGptApiService;
 import com.example.readerapp.databinding.ActivityEpubViewerBinding;
 import com.example.readerapp.ui.customViews.ReaderView;
 import com.example.readerapp.ui.viewModels.EpubViewerViewModel;
-import com.example.readerapp.ui.viewModels.FileViewerViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.epub.EpubReader;
 
 public class EpubViewerActivity extends AppCompatActivity {
 

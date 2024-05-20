@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.aiResponse.AiResponse;
-import com.example.readerapp.data.models.aiResponse.GptResponseViewModel;
+import com.example.readerapp.data.models.AiResponse;
+import com.example.readerapp.ui.viewModels.GptResponseViewModel;
 import com.example.readerapp.databinding.ActivityResponseHistoryViewerBinding;
 import com.example.readerapp.ui.adapters.ResponsesRecyclerViewAdapter;
 

@@ -7,8 +7,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
-import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
+import com.example.readerapp.data.models.ReadableFile;
+import com.example.readerapp.data.repositories.ReadableFileRepository;
 import com.example.readerapp.data.repositories.ExternalStorageRepository;
 
 import java.util.ArrayList;

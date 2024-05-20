@@ -1,6 +1,5 @@
 package com.example.readerapp.ui.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +13,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.readerapp.R;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.ReadableFile;
 
 import java.util.ArrayList;
 import java.util.Objects;

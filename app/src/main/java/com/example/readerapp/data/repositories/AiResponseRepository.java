@@ -1,10 +1,12 @@
-package com.example.readerapp.data.models.aiResponse;
+package com.example.readerapp.data.repositories;
 
 import android.app.Application;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.readerapp.data.models.AppDatabase;
+import com.example.readerapp.data.AppDatabase;
+import com.example.readerapp.data.models.AiResponse;
+import com.example.readerapp.data.dataSources.AiResponseDao;
 
 import java.util.ArrayList;
 import java.util.List;

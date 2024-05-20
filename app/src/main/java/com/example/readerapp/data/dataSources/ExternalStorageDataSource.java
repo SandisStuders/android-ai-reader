@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.ReadableFile;
 import com.example.readerapp.utils.HelperFunctions;
 
 import java.io.File;

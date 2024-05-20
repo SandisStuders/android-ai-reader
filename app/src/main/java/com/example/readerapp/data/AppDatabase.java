@@ -1,4 +1,4 @@
-package com.example.readerapp.data.models;
+package com.example.readerapp.data;
 
 import android.content.Context;
 
@@ -6,10 +6,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.example.readerapp.data.models.aiResponse.AiResponse;
-import com.example.readerapp.data.models.aiResponse.AiResponseDao;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileDao;
+import com.example.readerapp.data.dataSources.AiResponseDao;
+import com.example.readerapp.data.dataSources.ReadableFileDao;
+import com.example.readerapp.data.models.AiResponse;
+import com.example.readerapp.data.models.ReadableFile;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

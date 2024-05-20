@@ -1,12 +1,12 @@
-package com.example.readerapp.data.models.readableFile;
+package com.example.readerapp.data.repositories;
 
 import android.app.Application;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.readerapp.data.models.AppDatabase;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileDao;
+import com.example.readerapp.data.AppDatabase;
+import com.example.readerapp.data.models.ReadableFile;
+import com.example.readerapp.data.dataSources.ReadableFileDao;
 
 import java.util.ArrayList;
 import java.util.HashSet;

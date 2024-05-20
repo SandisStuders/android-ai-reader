@@ -5,10 +5,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.example.readerapp.data.dataSources.ExternalStorageDataSource;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
+import com.example.readerapp.data.models.ReadableFile;
 
 import java.io.BufferedReader;
 import java.io.File;

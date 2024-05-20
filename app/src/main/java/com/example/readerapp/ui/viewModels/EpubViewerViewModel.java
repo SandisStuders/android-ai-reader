@@ -6,10 +6,10 @@ import android.content.Context;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.example.readerapp.data.models.aiResponse.AiResponse;
-import com.example.readerapp.data.models.aiResponse.AiResponseRepository;
-import com.example.readerapp.data.models.readableFile.ReadableFile;
-import com.example.readerapp.data.models.readableFile.ReadableFileRepository;
+import com.example.readerapp.data.models.AiResponse;
+import com.example.readerapp.data.repositories.AiResponseRepository;
+import com.example.readerapp.data.models.ReadableFile;
+import com.example.readerapp.data.repositories.ReadableFileRepository;
 import com.example.readerapp.data.repositories.AiConnectionRepository;
 import com.example.readerapp.data.repositories.EpubDocumentRepository;
 import com.example.readerapp.data.repositories.EpubDocumentRepository.Chapter;

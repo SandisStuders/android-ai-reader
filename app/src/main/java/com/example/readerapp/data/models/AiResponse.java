@@ -1,4 +1,4 @@
-package com.example.readerapp.data.models.aiResponse;
+package com.example.readerapp.data.models;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

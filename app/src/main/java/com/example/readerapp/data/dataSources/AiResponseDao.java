@@ -1,4 +1,4 @@
-package com.example.readerapp.data.models.aiResponse;
+package com.example.readerapp.data.dataSources;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -7,6 +7,8 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+
+import com.example.readerapp.data.models.AiResponse;
 
 import java.util.ArrayList;
 import java.util.List;
