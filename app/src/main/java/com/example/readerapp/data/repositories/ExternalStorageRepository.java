@@ -79,31 +79,12 @@ public class ExternalStorageRepository {
     }
 
     public Book getEpubWithUriString(String uriString) {
-        try {
-            Uri uri = Uri.parse(uriString);
-            InputStream fileStream = application.getContentResolver().openInputStream(uri);
-            return  (new EpubReader()).readEpub(fileStream);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        Uri uri = Uri.parse(uriString);
+        return externalStorageDataSource.getEpubWithUri(uri);
     }
 
     public String getEpubResourceContent(Resource resource) {
-        StringBuilder contentBuilder = new StringBuilder();
-        try {
-            InputStreamReader contentReader = new InputStreamReader(resource.getInputStream());
-            BufferedReader r = new BufferedReader(contentReader);
-            String aux;
-            while ((aux = r.readLine()) != null) {
-                contentBuilder.append(aux);
-                contentBuilder.append('\n');
-            }
-            return contentBuilder.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
+        return externalStorageDataSource.getEpubResourceContent(resource);
     }
 
     private static class FileType {
