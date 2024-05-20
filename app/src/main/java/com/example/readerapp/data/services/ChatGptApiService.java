@@ -25,8 +25,6 @@ public class ChatGptApiService {
 
     public String processPrompt(String systemPrompt, String prompt, int maxTokens, Double temperature) {
         try {
-
-            Log.d("MyLogs", "API KEY: " + apiKey);
             URI uri = new URI(apiEndpoint);
             URL urlObj = uri.toURL();
 
