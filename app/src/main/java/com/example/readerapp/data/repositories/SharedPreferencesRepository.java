@@ -1,37 +1,36 @@
 package com.example.readerapp.data.repositories;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
-import androidx.preference.PreferenceManager;
+
+import com.example.readerapp.data.dataSources.SharedPreferencesDataSource;
 
 public class SharedPreferencesRepository {
 
     Application application;
-    SharedPreferences sharedPreferences;
+    SharedPreferencesDataSource sharedPreferencesDataSource;
 
     public SharedPreferencesRepository(Application application) {
         this.application = application;
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application.getApplicationContext());
+        this.sharedPreferencesDataSource = new SharedPreferencesDataSource(application);
     }
 
     public int getTemperature() {
-        return sharedPreferences.getInt("temperature", 40);
+        return sharedPreferencesDataSource.getTemperature();
     }
 
     public boolean fileNameIncluded() {
-        return sharedPreferences.getBoolean("send_file_name", false);
+        return sharedPreferencesDataSource.fileNameIncluded();
     }
 
     public String getUsersPersonalPrompt() {
-        return sharedPreferences.getString("personal_prompt_define", "");
+        return sharedPreferencesDataSource.getUsersPersonalPrompt();
     }
 
     public void updateAppThemeToSettingsSelection() {
-        int theme = Integer.parseInt(sharedPreferences.getString("theme", "0"));
+        int theme = Integer.parseInt(sharedPreferencesDataSource.getAppTheme());
 
         if (theme == 0) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
@@ -43,7 +42,7 @@ public class SharedPreferencesRepository {
     }
 
     public void updateAppLanguageToSettingsSelection() {
-        String lang = sharedPreferences.getString("language", "0");
+        String lang = sharedPreferencesDataSource.getAppLanguage();
 
         LocaleListCompat appLocale = LocaleListCompat.forLanguageTags(lang);
         AppCompatDelegate.setApplicationLocales(appLocale);
